@@ -38,6 +38,15 @@ function serveStatic(req, res) {
 }
 
 const server = http.createServer((req, res) => {
+  // allow the deployed site to use this machine's JDK as a runner
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204).end();
+    return;
+  }
+
   if (req.url.startsWith('/api/')) {
     handleApi(req, res).catch(err => {
       console.error('[api] unhandled error:', err);
