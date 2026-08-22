@@ -15,7 +15,7 @@ const java = lines.join('\n');
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'harness-chk-'));
 fs.writeFileSync(path.join(dir, 'Harness.java'), java);
 try {
-  execFileSync('javac', ['--release', '11', path.join(dir, 'Harness.java')], { stdio: 'pipe' });
+  execFileSync('javac', ['--release', '8', path.join(dir, 'Harness.java')], { stdio: 'pipe' });
   console.log('HARNESS_SOURCE compiles OK (' + java.split('\n').length + ' lines)');
 } catch (e) {
   console.error('COMPILE FAILED:\n' + e.stderr.toString());

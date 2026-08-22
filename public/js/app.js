@@ -292,10 +292,11 @@
   // Priority: local JDK server > JDoodle (if keys configured) > CheerpJ
   // in-browser JVM (default for static hosting - no accounts, no quotas).
   //
-  // CheerpJ runs a real OpenJDK (WebAssembly) entirely client-side. User code
-  // is written into the /str mount, compiled with a bundled Eclipse batch
-  // compiler (ecj), then executed under a harness that captures stdout/stderr
-  // and feeds stdin. Output returns via cjFileBlob.
+  // CheerpJ runs a real OpenJDK (WebAssembly) entirely client-side in its
+  // default Java 8 configuration - the exact stack JavaFiddle proven works.
+  // User code is written into the /str mount, compiled with a bundled JDK8
+  // javac (tools.jar) driven by a small harness jar that captures all
+  // diagnostics to a virtual file. Output returns via cjFileBlob.
 
   const CHEERPJ_LOADER = 'https://cjrtnc.leaningtech.com/4.3/loader.js';
 
@@ -381,8 +382,9 @@
 
         if (!window.cheerpjInit) throw new Error('CheerpJ loader did not initialise');
 
-        // ECJ 3.42 bytecode targets Java 17 - the runtime must match
-        await window.cheerpjInit({ version: 17, status: 'none' });
+        // Default (Java 8) runtime - the proven JavaFiddle configuration.
+        // Bundled JDK8 tools.jar provides javac; no module-system pitfalls.
+        await window.cheerpjInit({ status: 'none' });
         window.cheerpjCreateDisplay(consoleEl);
       })();
       cjReadyPromise.catch(() => { cjReadyPromise = null; });
@@ -398,12 +400,13 @@
     window.cheerpOSAddStringFile('/str/Harness.java', HARNESS_SOURCE);
     window.cheerpOSAddStringFile('/str/input.txt', stdin || '');
 
-    // Compile via precompiled harness jar that captures diagnostics into a
+    // Compile via precompiled harness jar that drives the bundled JDK8 javac
+    // (com.sun.tools.javac.Main.compile) and captures diagnostics into a
     // virtual file - reliable, unlike scraping the hidden display div.
     const compileExit = await window.cheerpjRunMain(
       'CompileHarness',
-      '/app/cheerpj/harness.jar:/app/cheerpj/ecj.jar',
-      '-nowarn', '-11', '-d', '/files/work/classes', '/str/Main.java', '/str/Harness.java'
+      '/app/cheerpj/harness.jar:/app/cheerpj/tools.jar',
+      '-nowarn', '-d', '/files/work/classes', '/str/Main.java', '/str/Harness.java'
     );
 
     const compileLog = await readVFile('/files/work/compile.log');
