@@ -38,6 +38,11 @@ function normalize(text) {
 }
 
 async function handleApi(req, res) {
+  if (req.method === 'GET' && req.url === '/api/health') {
+    sendJson(res, 200, { status: 'ok', runner: 'local-jdk' });
+    return;
+  }
+
   if (req.method === 'GET' && req.url === '/api/questions') {
     sendJson(res, 200, questions);
     return;
