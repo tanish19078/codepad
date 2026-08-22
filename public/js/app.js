@@ -300,54 +300,7 @@
 
   const CHEERPJ_LOADER = 'https://cjrtnc.leaningtech.com/4.3/loader.js';
 
-  const HARNESS_SOURCE = [
-    'import java.io.*;',
-    'import java.lang.reflect.Method;',
-    'import java.nio.charset.StandardCharsets;',
-    'import java.nio.file.*;',
-    '',
-    'public class Harness {',
-    '    public static void main(String[] args) throws Exception {',
-    '        Thread watchdog = new Thread(() -> {',
-    '            try { Thread.sleep(15000); } catch (InterruptedException ignored) {}',
-    '            Runtime.getRuntime().halt(137);',
-    '        });',
-    '        watchdog.setDaemon(true);',
-    '        watchdog.start();',
-    '',
-    '        byte[] input;',
-    '        try { input = Files.readAllBytes(Paths.get("/str/input.txt")); }',
-    '        catch (Exception e) { input = new byte[0]; }',
-    '',
-    '        PrintStream origOut = System.out;',
-    '        PrintStream origErr = System.err;',
-    '        ByteArrayOutputStream buf = new ByteArrayOutputStream();',
-    '        PrintStream cap = new PrintStream(buf, true, "UTF-8");',
-    '        System.setOut(cap);',
-    '        System.setErr(cap);',
-    '        int exit = 0;',
-    '        try {',
-    '            System.setIn(new ByteArrayInputStream(input));',
-    '            Method m = Class.forName("Main").getDeclaredMethod("main", String[].class);',
-    '            m.setAccessible(true);',
-    '            m.invoke(null, (Object) new String[0]);',
-    '            cap.flush();',
-    '        } catch (Throwable t) {',
-    '            t.printStackTrace(cap);',
-    '            exit = 1;',
-    '        } finally {',
-    '            System.setOut(origOut);',
-    '            System.setErr(origErr);',
-    '            watchdog.interrupt();',
-    '        }',
-    '        byte[] payload = (exit + "\\n" + buf.toString("UTF-8")).getBytes(StandardCharsets.UTF_8);',
-    '        Files.createDirectories(Paths.get("/files/work"));',
-    '        Files.write(Paths.get("/files/work/output.txt"), payload);',
-    '        System.exit(0);',
-    '    }',
-    '}',
-  ].join('\n');
-
+  
   let cjReadyPromise = null;
 
   /** Read a virtual file with retries (IndexedDB flush can lag slightly) */
@@ -397,70 +350,59 @@
     await ensureCheerpJ();
 
     window.cheerpOSAddStringFile('/str/Main.java', code);
-    window.cheerpOSAddStringFile('/str/Harness.java', HARNESS_SOURCE);
     window.cheerpOSAddStringFile('/str/input.txt', stdin || '');
 
-    // Compile exactly like JavaFiddle: sources from /str, classes to /files/
-    // root, compiler jar + output dir both on the classpath. Diagnostics are
-    // captured by CompileHarness into a virtual file.
-    const compileExit = await window.cheerpjRunMain(
-      'CompileHarness',
-      '/app/cheerpj/harness.jar:/app/cheerpj/tools.jar',
-      '-nowarn', '-d', '/files/', '/str/Main.java', '/str/Harness.java'
+    // Single JVM call: RunnerHarness compiles /str/Main.java fully in memory
+    // (javax.tools, no classpath juggling), runs Main.main with stdin from
+    // /str/input.txt, captures stdout/stderr, and writes everything to
+    // /files/work/result.txt for us to read back.
+    const runExit = await window.cheerpjRunMain(
+      'RunnerHarness',
+      '/app/cheerpj/runner.jar:/app/cheerpj/tools.jar'
     );
 
-    const compileLog = await readVFile('/files/work/compile.log');
-    const nlC = compileLog.indexOf('\n');
-    const cStatus = nlC === -1 ? String(compileExit) : compileLog.slice(0, nlC).replace('STATUS:', '').trim();
-    const cDiag = nlC === -1 ? '' : compileLog.slice(nlC + 1).trim();
+    let raw = await readVFile('/files/work/result.txt');
 
-    if (compileExit !== 0 || cStatus === '1') {
+    if (!raw) {
+      await new Promise(r => setTimeout(r, 400));
+      raw = await readVFile('/files/work/result.txt', 3);
+    }
+
+    if (!raw) {
       return {
-        stage: 'compile',
+        stage: 'ok',
         stdout: '',
-        stderr: '',
-        compileOutput: cDiag || ('Compilation failed (exit code ' + compileExit + ')'),
+        stderr: 'The in-browser runner produced no result (exit ' + runExit
+          + '). Try reloading the page - if it persists, run `npm start` locally instead.',
+        compileOutput: '',
         timeMs: Math.round(performance.now() - startedAt),
       };
     }
 
-    // Same classpath recipe as the compile step plus /files/ for the
-    // freshly compiled classes (JavaFiddle-proven layout).
-    const RUN_CP = '/app/cheerpj/harness.jar:/app/cheerpj/tools.jar:/files/';
-    const runExit = await window.cheerpjRunMain('Harness', RUN_CP);
+    const lines = raw.split('\n');
+    const cLine = lines.find(l => l.startsWith('CSTATUS:')) || 'CSTATUS:1';
+    const clogLine = lines.find(l => l.startsWith('CLOG:')) || 'CLOG:';
+    const eLine = lines.find(l => l.startsWith('ESTATUS:')) || 'ESTATUS:0';
 
-    let stderr = '';
-    let stdout = '';
-    let sawMarker = false;
+    const cStatus = Number(cLine.slice(8).trim());
+    const clog = clogLine.slice(5).replace(/\u0001/g, '\n').trim();
+    const eStatus = Number(eLine.slice(8).trim());
+    const stdout = raw.slice(raw.indexOf('\n', raw.indexOf('ESTATUS:') + 1) + 1);
 
-    const raw = await readVFile('/files/work/output.txt', 4);
-    if (raw) {
-      const nl = raw.indexOf('\n');
-      if (nl !== -1) {
-        sawMarker = true;
-        if (raw.slice(0, nl).trim() !== '0') {
-          stderr = 'Program exited with an error - see output below.';
-          stdout = raw.slice(nl + 1);
-        } else {
-          stdout = raw.slice(nl + 1);
-        }
-      }
-    }
-
-    if (!sawMarker) {
-      // Harness never wrote its result: surface whatever the JVM printed into
-      // the hidden display div (e.g. "Could not find or load main class").
-      await new Promise(r => setTimeout(r, 300));
-      const display = document.getElementById('cheerpj-display');
-      const jvmMsg = display ? display.innerText.trim() : '';
-      stderr = 'Time Limit Exceeded (15s) or abnormal termination (exit ' + runExit + ')'
-        + (jvmMsg ? '\n\nJVM said:\n' + jvmMsg.slice(-800) : '');
+    if (cStatus !== 0) {
+      return {
+        stage: 'compile',
+        stdout: '',
+        stderr: '',
+        compileOutput: clog || ('Compilation failed (exit ' + cStatus + ')'),
+        timeMs: Math.round(performance.now() - startedAt),
+      };
     }
 
     return {
       stage: 'ok',
       stdout,
-      stderr,
+      stderr: eStatus !== 0 ? 'Program exited with an error - stack trace shown in output.' : '',
       compileOutput: '',
       timeMs: Math.round(performance.now() - startedAt),
     };

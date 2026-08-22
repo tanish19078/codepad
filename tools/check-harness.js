@@ -1,22 +1,18 @@
-// Sanity-check: extract HARNESS_SOURCE from app.js and compile it with javac.
+// Sanity-check: RunnerHarness must compile against the bundled JDK8 tools.jar
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const src = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'app.js'), 'utf8');
-const m = src.match(/const HARNESS_SOURCE = \[([\s\S]*?)\]\.join\('\\n'\);/);
-if (!m) { console.error('HARNESS_SOURCE not found'); process.exit(1); }
-
-const arrSrc = '[' + m[1] + ']';
-const lines = eval(arrSrc);
-const java = lines.join('\n');
-
-const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'harness-chk-'));
-fs.writeFileSync(path.join(dir, 'Harness.java'), java);
+const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'runner-chk-'));
 try {
-  execFileSync('javac', ['--release', '8', path.join(dir, 'Harness.java')], { stdio: 'pipe' });
-  console.log('HARNESS_SOURCE compiles OK (' + java.split('\n').length + ' lines)');
+  execFileSync('javac', [
+    '-nowarn', '--release', '8',
+    '-cp', path.join(__dirname, '..', 'public', 'cheerpj', 'tools.jar'),
+    '-d', path.join(dir, 'out'),
+    path.join(__dirname, '..', 'tools', 'RunnerHarness.java'),
+  ], { stdio: 'pipe' });
+  console.log('RunnerHarness compiles OK (Java 8 target)');
 } catch (e) {
   console.error('COMPILE FAILED:\n' + e.stderr.toString());
   process.exit(1);
