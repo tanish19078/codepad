@@ -13,7 +13,7 @@ function readJsonBody(req) {
     });
     req.on('end', () => {
       try {
-        resolve(body ? JSON.parse(body) : {});
+        resolve(body ? JSON.parse(body.replace(/^\uFEFF/, '')) : {});
       } catch (err) {
         reject(new Error('Invalid JSON body'));
       }
