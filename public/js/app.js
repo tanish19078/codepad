@@ -349,6 +349,19 @@
 
   let cjReadyPromise = null;
 
+  /** Read a virtual file with retries (IndexedDB flush can lag slightly) */
+  async function readVFile(path, tries = 10) {
+    for (let i = 0; i < tries; i++) {
+      try {
+        const blob = await window.cjFileBlob(path);
+        const text = await blob.text();
+        if (text) return text;
+      } catch (_) {}
+      await new Promise(r => setTimeout(r, 150));
+    }
+    return '';
+  }
+
   function ensureCheerpJ() {
     if (!cjReadyPromise) {
       cjReadyPromise = (async () => {
@@ -388,22 +401,25 @@
     window.cheerpOSAddStringFile('/str/Harness.java', HARNESS_SOURCE);
     window.cheerpOSAddStringFile('/str/input.txt', stdin || '');
 
-    const display = document.getElementById('cheerpj-display');
-    if (display) display.textContent = '';
-
+    // Compile via precompiled harness jar that captures diagnostics into a
+    // virtual file - reliable, unlike scraping the hidden display div.
     const compileExit = await window.cheerpjRunMain(
-      'org.eclipse.jdt.internal.compiler.batch.Main',
-      '/app/cheerpj/ecj.jar',
+      'CompileHarness',
+      '/app/cheerpj/harness.jar:/app/cheerpj/ecj.jar',
       '-nowarn', '-11', '-d', '/files/work/classes', '/str/Main.java', '/str/Harness.java'
     );
 
-    if (compileExit !== 0) {
-      const diag = display ? display.textContent.trim() : '';
+    const compileLog = await readVFile('/files/work/compile.log');
+    const nlC = compileLog.indexOf('\n');
+    const cStatus = nlC === -1 ? String(compileExit) : compileLog.slice(0, nlC).replace('STATUS:', '').trim();
+    const cDiag = nlC === -1 ? '' : compileLog.slice(nlC + 1).trim();
+
+    if (compileExit !== 0 || cStatus === '1') {
       return {
         stage: 'compile',
         stdout: '',
         stderr: '',
-        compileOutput: diag || 'Compilation failed (exit code ' + compileExit + ')',
+        compileOutput: cDiag || ('Compilation failed (exit code ' + compileExit + ')'),
         timeMs: Math.round(performance.now() - startedAt),
       };
     }
@@ -411,17 +427,14 @@
     const runExit = await window.cheerpjRunMain('Harness', '/files/work/classes');
 
     let raw = '';
-    try {
-      const blob = await window.cjFileBlob('/files/work/output.txt');
-      raw = await blob.text();
-    } catch (_) {}
+    if (runExit === 0) raw = await readVFile('/files/work/output.txt');
 
     const nl = raw.indexOf('\n');
     const exitMarker = nl === -1 ? '' : raw.slice(0, nl).trim();
     const stdout = nl === -1 ? '' : raw.slice(nl + 1);
 
     let stderr = '';
-    if (runExit === 137 || (runExit !== 0 && exitMarker !== '1' && exitMarker !== '0')) {
+    if (runExit !== 0 && exitMarker !== '1' && exitMarker !== '0') {
       stderr = 'Time Limit Exceeded (15s) or abnormal termination (exit ' + runExit + ')';
     }
 
