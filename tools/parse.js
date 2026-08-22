@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const raw = fs.readFileSync(path.join(__dirname, '..', 'docx_text.txt'), 'utf8');
+const raw = fs.readFileSync(path.join(__dirname, 'docx_text.txt'), 'utf8');
 const lines = raw.split(/\r?\n/).map(l => l.replace(/^\[P\]/, '').replace(/\s+$/,''));
 
 const SECTIONS = {
@@ -49,7 +49,7 @@ const SECTIONS = {
 
 // Find body question headers: "Q<n>. <title>" followed by a difficulty/concept line
 const qHeaderRe = /^Q(\d+)\.\s+(.+)$/;
-const diffRe = /^(EASY|MEDIUM-HARD|MEDIUM|HARD)\s+Concept:\s*(.*)$/i;
+const diffRe = /^\s*(EASY|MEDIUM-HARD|MEDIUM|HARD)\s+Concept:\s*(.*)$/i;
 
 const questions = [];
 let i = 0;
