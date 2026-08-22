@@ -114,6 +114,7 @@ html, body {
   padding: 3px 9px; border-radius: 999px; text-transform: uppercase;
 }
 .badge.diff { color: #0d1117; }
+.solved-badge { color: var(--green); background: rgba(63,185,80,.14); border: 1px solid rgba(63,185,80,.45); }
 .concept-badge { color: var(--purple); background: rgba(188,140,255,.12); font-size: 12px; font-weight: 500; }
 
 .q-section { margin-top: 20px; }
@@ -165,11 +166,13 @@ details.solution[open] summary { border-bottom: 1px dashed var(--border); }
   background: var(--bg);
 }
 .editor-toolbar {
-  height: 42px; display: flex; align-items: center; justify-content: space-between;
+  height: 42px; display: flex; align-items: center; gap: 12px;
   padding: 0 10px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
 }
 .file-name { font-family: var(--mono); color: var(--text-dim); font-size: 13px; }
-.toolbar-actions { display: flex; gap: 8px; }
+.save-indicator { font-size: 11.5px; color: var(--green); opacity: 0; transition: opacity .4s ease; font-family: var(--mono); }
+.save-indicator.show { opacity: 1; }
+.toolbar-actions { margin-left: auto; display: flex; gap: 8px; }
 .btn {
   border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text);
   padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;

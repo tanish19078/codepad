@@ -4,12 +4,14 @@
 
   const LS_SOLVED = 'codepad.solved.v1';
   const LS_CODE = qid => `codepad.code.q${qid}`;
+  const LS_LAST = 'codepad.last.v1';
 
   const state = {
     questions: [],
     currentId: null,
     solved: new Set(JSON.parse(localStorage.getItem(LS_SOLVED) || '[]')),
     busy: false,
+    serverMode: false,
   };
 
   // ---------- helpers ----------
@@ -36,6 +38,15 @@
     localStorage.setItem(LS_SOLVED, JSON.stringify([...state.solved]));
     renderSidebar();
     renderProgress();
+    if (qid === state.currentId) {
+      const row = document.querySelector('.badge-row');
+      if (row && !row.querySelector('.solved-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'badge solved-badge';
+        badge.innerHTML = '&#10003; Completed';
+        row.prepend(badge);
+      }
+    }
   }
 
   async function api(path, body) {
@@ -102,6 +113,7 @@
       <div class="q-header">
         <h1>Q${q.id}. ${esc(q.title)}</h1>
         <div class="badge-row">
+          ${state.solved.has(q.id) ? '<span class="badge solved-badge">&#10003; Completed</span>' : ''}
           <span class="badge diff ${difficultyClass(q.difficulty)}">${q.difficulty}</span>
           <span class="concept-badge">${esc(q.concept)}</span>
         </div>
@@ -147,6 +159,7 @@
   // ---------- selection ----------
   function selectQuestion(id) {
     state.currentId = id;
+    localStorage.setItem(LS_LAST, String(id));
     const q = currentQuestion();
     renderQuestionPane(q);
     renderSidebar($('#searchBox').value);
@@ -177,7 +190,8 @@
 
   function renderRunResult(r) {
     $('#consoleTitle').textContent = 'Output';
-    $('#consoleMeta').textContent = r.stage === 'ok' ? `${r.timeMs} ms` : '';
+    const meta = r.stage === 'ok' && r.timeMs != null ? `${r.timeMs} ms` : '';
+    $('#consoleMeta').textContent = meta;
     const body = $('#consoleBody');
 
     let html = '';
@@ -187,7 +201,8 @@
     } else {
       html += `<span class="console-label">stdout</span><pre class="console-pre">${esc(r.stdout) || '(no output)'}</pre>`;
       if (r.stderr) html += `<span class="console-label">stderr</span><pre class="console-pre err">${esc(r.stderr)}</pre>`;
-      html += `<span class="console-label">exit</span><pre class="console-pre">process finished in ${r.timeMs} ms</pre>`;
+      const timing = r.timeMs != null ? `process finished in ${r.timeMs} ms` : 'process finished';
+      html += `<span class="console-label">exit</span><pre class="console-pre">${timing}</pre>`;
     }
     body.innerHTML = html;
   }
@@ -264,6 +279,65 @@
     if (data.verdict === 'ACCEPTED') markSolved(q.id);
   }
 
+  // ---------- persistence indicator ----------
+  let savedTimer = null;
+  function flashSaved() {
+    const el = $('#saveIndicator');
+    if (!el) return;
+    el.textContent = 'Saved';
+    el.classList.add('show');
+    clearTimeout(savedTimer);
+    savedTimer = setTimeout(() => el.classList.remove('show'), 1200);
+  }
+
+  // ---------- execution (local runner or Piston fallback) ----------
+  // Vercel/static hosting has no Java backend, so we execute through the
+  // public Piston API (https://emkc.org) when /api/health is unavailable.
+  let pistonVersion = null;
+
+  async function getPistonVersion() {
+    if (pistonVersion) return pistonVersion;
+    const res = await fetch('https://emkc.org/api/v2/piston/runtimes');
+    if (!res.ok) throw new Error('Piston runtimes HTTP ' + res.status);
+    const list = await res.json();
+    const java = list.find(r => r.language === 'java' || (r.aliases || []).includes('java'));
+    pistonVersion = java ? java.version : '15.0.2';
+    return pistonVersion;
+  }
+
+  async function pistonRun(code, stdin = '') {
+    const version = await getPistonVersion();
+    const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: 'java',
+        version,
+        files: [{ name: 'Main.java', content: code }],
+        stdin,
+        compile_timeout: 20000,
+        run_timeout: 10000,
+      }),
+    });
+    if (!res.ok) throw new Error('Piston HTTP ' + res.status);
+    const data = await res.json();
+    const compileFailed = data.compile && data.compile.code !== 0;
+    return {
+      stage: compileFailed ? 'compile' : 'ok',
+      stdout: (data.run && data.run.stdout) || '',
+      stderr: (data.run && data.run.stderr) || '',
+      compileOutput: compileFailed
+        ? ((data.compile.stdout || '') + (data.compile.stderr || '')).trim()
+        : '',
+      timeMs: data.run && typeof data.run.signal === 'undefined' ? null : null,
+    };
+  }
+
+  async function execute(code, stdin) {
+    if (state.serverMode) return api('/api/run', { code, stdin });
+    return pistonRun(code, stdin);
+  }
+
   // ---------- actions ----------
   async function handleRun() {
     const q = currentQuestion();
@@ -273,7 +347,7 @@
     $('#runBtn').innerHTML = '&#9203; Running';
     try {
       saveCode(q, editor.getValue());
-      const result = await api('/api/run', { code: editor.getValue(), stdin: $('#stdinBox').value });
+      const result = await execute(editor.getValue(), $('#stdinBox').value);
       renderRunResult(result);
     } catch (err) {
       $('#consoleBody').innerHTML = `<pre class="console-pre err">Request failed: ${esc(err.message)}</pre>`;
@@ -284,6 +358,38 @@
     }
   }
 
+  /** Client-side judging for static hosting: run each testcase through Piston */
+  async function judgeLocally(q, code) {
+    const testcases = [{ input: q.sampleInput, expected: q.sampleOutput }];
+    const norm = t => t
+      .replace(/\r\n?/g, '\n')
+      .split('\n')
+      .map(l => l.replace(/[ \t]+$/, ''))
+      .join('\n')
+      .replace(/\n+$/, '');
+
+    const results = [];
+    for (const tc of testcases) {
+      let r;
+      try {
+        r = await pistonRun(code, tc.input);
+      } catch (err) {
+        return { verdict: 'RUN_ERROR', error: err.message, results: [] };
+      }
+      results.push({
+        passed: r.stage === 'ok' && norm(r.stdout) === norm(tc.expected),
+        input: tc.input,
+        expected: tc.expected,
+        actual: r.stdout,
+        stage: r.stage,
+        stderr: r.stderr,
+        compileOutput: r.compileOutput,
+        timeMs: r.timeMs || null,
+      });
+    }
+    return { verdict: results.every(r => r.passed) ? 'ACCEPTED' : 'WRONG_ANSWER', results };
+  }
+
   async function handleSubmit() {
     const q = currentQuestion();
     if (!q || state.busy) return;
@@ -292,7 +398,9 @@
     $('#submitBtn').innerHTML = '&#9203; Judging';
     try {
       saveCode(q, editor.getValue());
-      const result = await api('/api/submit', { questionId: q.id, code: editor.getValue() });
+      const result = state.serverMode
+        ? await api('/api/submit', { questionId: q.id, code: editor.getValue() })
+        : await judgeLocally(q, editor.getValue());
       renderSubmitResult(result, q);
     } catch (err) {
       $('#consoleBody').innerHTML = `<pre class="console-pre err">Request failed: ${esc(err.message)}</pre>`;
@@ -307,27 +415,43 @@
   let editor;
 
   async function init() {
+    // detect whether we're served by the local Node backend or static hosting
     try {
-      state.questions = await api('/api/questions');
-    } catch (err) {
-      document.body.innerHTML = `<p style="padding:40px;color:#f85149">Failed to load questions: ${esc(err.message)}</p>`;
-      return;
+      const h = await fetch('/api/health');
+      state.serverMode = h.ok;
+    } catch (_) {
+      state.serverMode = false;
     }
 
+    let loaded = null;
     try {
-      editor = new CodeEditor($('#editor'), {
-        onChange: code => {
-          const q = currentQuestion();
-          if (q) saveCode(q, code);
-        },
-        onRunShortcut: handleRun,
-      });
+      loaded = await api('/api/questions');
+    } catch (_) {
+      // static hosting without the rewrite -> load the bank directly
+      const res = await fetch('/questions.json');
+      if (!res.ok) throw new Error('could not load question bank');
+      loaded = await res.json();
+    }
+    state.questions = loaded;
 
-    // initial question: from hash (#q7), first unsolved, or Q1
+    try {
+    editor = new CodeEditor($('#editor'), {
+      onChange: code => {
+        const q = currentQuestion();
+        if (q) {
+          saveCode(q, code);
+          flashSaved();
+        }
+      },
+      onRunShortcut: handleRun,
+    });
+
+    // initial question: from hash (#q7), last opened, first unsolved, or Q1
     const hashMatch = (location.hash.match(/^#q(\d+)$/) || [])[1];
     const hashQ = hashMatch && state.questions.find(x => x.id === Number(hashMatch));
+    const lastQ = state.questions.find(x => x.id === Number(localStorage.getItem(LS_LAST)));
     const firstUnsolved = state.questions.find(x => !state.solved.has(x.id));
-    selectQuestion(hashQ ? hashQ.id : (firstUnsolved || state.questions[0]).id);
+    selectQuestion(hashQ ? hashQ.id : (lastQ || firstUnsolved || state.questions[0]).id);
     if (!hashQ) history.replaceState(null, '', '');
 
     renderProgress();
