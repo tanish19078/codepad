@@ -288,11 +288,163 @@
     savedTimer = setTimeout(() => el.classList.remove('show'), 1200);
   }
 
-  // ---------- execution (local runner, JDoodle, or none) ----------
-  // Vercel/static hosting has no JDK. The public Piston API now requires an
-  // authorization key (not granted for personal projects), so static mode
-  // executes through JDoodle's free tier using credentials the user stores
-  // locally. Local `npm start` mode always uses the bundled JDK runner.
+  // ---------- execution providers ----------
+  // Priority: local JDK server > JDoodle (if keys configured) > CheerpJ
+  // in-browser JVM (default for static hosting - no accounts, no quotas).
+  //
+  // CheerpJ runs a real OpenJDK (WebAssembly) entirely client-side. User code
+  // is written into the /str mount, compiled with a bundled Eclipse batch
+  // compiler (ecj), then executed under a harness that captures stdout/stderr
+  // and feeds stdin. Output returns via cjFileBlob.
+
+  const CHEERPJ_LOADER = 'https://cjrtnc.leaningtech.com/4.3/loader.js';
+
+  const HARNESS_SOURCE = [
+    'import java.io.*;',
+    'import java.lang.reflect.Method;',
+    'import java.nio.charset.StandardCharsets;',
+    'import java.nio.file.*;',
+    '',
+    'public class Harness {',
+    '    public static void main(String[] args) throws Exception {',
+    '        Thread watchdog = new Thread(() -> {',
+    '            try { Thread.sleep(15000); } catch (InterruptedException ignored) {}',
+    '            Runtime.getRuntime().halt(137);',
+    '        });',
+    '        watchdog.setDaemon(true);',
+    '        watchdog.start();',
+    '',
+    '        byte[] input;',
+    '        try { input = Files.readAllBytes(Paths.get("/str/input.txt")); }',
+    '        catch (Exception e) { input = new byte[0]; }',
+    '',
+    '        PrintStream origOut = System.out;',
+    '        PrintStream origErr = System.err;',
+    '        ByteArrayOutputStream buf = new ByteArrayOutputStream();',
+    '        PrintStream cap = new PrintStream(buf, true, "UTF-8");',
+    '        System.setOut(cap);',
+    '        System.setErr(cap);',
+    '        int exit = 0;',
+    '        try {',
+    '            System.setIn(new ByteArrayInputStream(input));',
+    '            Method m = Class.forName("Main").getDeclaredMethod("main", String[].class);',
+    '            m.setAccessible(true);',
+    '            m.invoke(null, (Object) new String[0]);',
+    '            cap.flush();',
+    '        } catch (Throwable t) {',
+    '            t.printStackTrace(cap);',
+    '            exit = 1;',
+    '        } finally {',
+    '            System.setOut(origOut);',
+    '            System.setErr(origErr);',
+    '            watchdog.interrupt();',
+    '        }',
+    '        byte[] payload = (exit + "\\n" + buf.toString("UTF-8")).getBytes(StandardCharsets.UTF_8);',
+    '        Files.createDirectories(Paths.get("/files/work"));',
+    '        Files.write(Paths.get("/files/work/output.txt"), payload);',
+    '        System.exit(0);',
+    '    }',
+    '}',
+  ].join('\n');
+
+  let cjReadyPromise = null;
+
+  function ensureCheerpJ() {
+    if (!cjReadyPromise) {
+      cjReadyPromise = (async () => {
+        const consoleEl = document.createElement('div');
+        consoleEl.id = 'cheerpj-display';
+        consoleEl.style.cssText =
+          'position:absolute;left:-9999px;top:0;width:800px;height:600px;overflow:hidden;';
+        document.body.appendChild(consoleEl);
+
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = CHEERPJ_LOADER;
+          s.onload = resolve;
+          s.onerror = () => reject(new Error('Could not download the in-browser Java runtime'));
+          document.head.appendChild(s);
+        });
+
+        if (!window.cheerpjInit) throw new Error('CheerpJ loader did not initialise');
+
+        try {
+          await window.cheerpjInit({ version: 11, status: 'none' });
+        } catch (_) {
+          await window.cheerpjInit();
+        }
+        window.cheerpjCreateDisplay(consoleEl);
+      })();
+      cjReadyPromise.catch(() => { cjReadyPromise = null; });
+    }
+    return cjReadyPromise;
+  }
+
+  async function cheerpjExecute(code, stdin = '') {
+    const startedAt = performance.now();
+    await ensureCheerpJ();
+
+    window.cheerpOSAddStringFile('/str/Main.java', code);
+    window.cheerpOSAddStringFile('/str/Harness.java', HARNESS_SOURCE);
+    window.cheerpOSAddStringFile('/str/input.txt', stdin || '');
+
+    const display = document.getElementById('cheerpj-display');
+    if (display) display.textContent = '';
+
+    const compileExit = await window.cheerpjRunMain(
+      'org.eclipse.jdt.internal.compiler.batch.Main',
+      '/app/cheerpj/ecj.jar',
+      '-nowarn', '-11', '-d', '/files/work/classes', '/str/Main.java', '/str/Harness.java'
+    );
+
+    if (compileExit !== 0) {
+      const diag = display ? display.textContent.trim() : '';
+      return {
+        stage: 'compile',
+        stdout: '',
+        stderr: '',
+        compileOutput: diag || 'Compilation failed (exit code ' + compileExit + ')',
+        timeMs: Math.round(performance.now() - startedAt),
+      };
+    }
+
+    const runExit = await window.cheerpjRunMain('Harness', '/files/work/classes');
+
+    let raw = '';
+    try {
+      const blob = await window.cjFileBlob('/files/work/output.txt');
+      raw = await blob.text();
+    } catch (_) {}
+
+    const nl = raw.indexOf('\n');
+    const exitMarker = nl === -1 ? '' : raw.slice(0, nl).trim();
+    const stdout = nl === -1 ? '' : raw.slice(nl + 1);
+
+    let stderr = '';
+    if (runExit === 137 || (runExit !== 0 && exitMarker !== '1' && exitMarker !== '0')) {
+      stderr = 'Time Limit Exceeded (15s) or abnormal termination (exit ' + runExit + ')';
+    }
+
+    return {
+      stage: 'ok',
+      stdout,
+      stderr,
+      compileOutput: '',
+      timeMs: Math.round(performance.now() - startedAt),
+    };
+  }
+
+  function activeRunnerName() {
+    if (state.serverMode) return 'local JDK';
+    if (getJdoodleCreds()) return 'JDoodle';
+    return 'in-browser JVM';
+  }
+
+  async function execute(code, stdin) {
+    if (state.serverMode) return api('/api/run', { code, stdin });
+    if (getJdoodleCreds()) return jdoodleExecute(code, stdin);
+    return cheerpjExecute(code, stdin);
+  }
 
   function getJdoodleCreds() {
     try { return JSON.parse(localStorage.getItem(LS_JDOODLE) || 'null'); }
@@ -335,11 +487,6 @@
     };
   }
 
-  async function execute(code, stdin) {
-    if (state.serverMode) return api('/api/run', { code, stdin });
-    return jdoodleExecute(code, stdin);
-  }
-
   /** Client-side judging for static hosting */
   async function judgeLocally(q, code) {
     const testcases = [{ input: q.sampleInput, expected: q.sampleOutput }];
@@ -354,7 +501,7 @@
     for (const tc of testcases) {
       let r;
       try {
-        r = await jdoodleExecute(code, tc.input);
+        r = await execute(code, tc.input);
       } catch (err) {
         return { verdict: err.code === 'NO_RUNNER' ? 'NO_RUNNER' : 'RUN_ERROR', error: err.message, results: [] };
       }
@@ -366,7 +513,7 @@
         stage: r.stage,
         stderr: r.stderr,
         compileOutput: r.compileOutput,
-        timeMs: null,
+        timeMs: r.timeMs || null,
       });
     }
     return { verdict: results.every(r => r.passed) ? 'ACCEPTED' : 'WRONG_ANSWER', results };
@@ -376,7 +523,8 @@
     const creds = getJdoodleCreds();
     const current = creds ? `${creds.clientId.slice(0, 4)}...` : 'none';
     const choice = prompt(
-      `Java execution for this deployed site uses JDoodle's free API.\n` +
+      `Optional: connect JDoodle's free compiler API (otherwise the default\n` +
+      `in-browser JVM is used - no signup needed).\n\n` +
       `1) Sign up free at https://www.jdoodle.com/compiler-api/\n` +
       `2) Paste your clientId and clientSecret below.\n\n` +
       `Current credentials: ${current}\n\n` +
@@ -404,16 +552,9 @@
       return;
     }
     body.innerHTML =
-      `<div class="verdict COMPILE_ERROR">No Java runner on this deployment</div>` +
-      `<pre class="console-pre">Static sites can't run Java directly. Two options:
-
-  1) BEST - run locally with your installed JDK:
-        npm start   ->   http://localhost:3000
-
-  2) Or connect JDoodle's free compiler API:
-        https://www.jdoodle.com/compiler-api/
-        then click the gear button in the toolbar to save your keys
-        (stored only in this browser).</pre>`;
+      '<div class="console-hint">Runner: in-browser JVM (WebAssembly) &nbsp;·&nbsp; ' +
+      'first run downloads ~40MB once, then it is cached. Press Run to execute, or Submit for the sample tests. ' +
+      'Avoid infinite loops - they can freeze the tab.</div>';
   }
 
   // ---------- actions ----------
@@ -425,6 +566,10 @@
     $('#runBtn').innerHTML = '&#9203; Running';
     try {
       saveCode(q, editor.getValue());
+      if (!state.serverMode && !getJdoodleCreds() && !cjReadyPromise) {
+        $('#consoleBody').innerHTML =
+          '<div class="verdict COMPILE_ERROR">&#9203; Loading in-browser Java runtime (~40MB, one time)...</div>';
+      }
       const result = await execute(editor.getValue(), $('#stdinBox').value);
       renderRunResult(result);
     } catch (err) {
