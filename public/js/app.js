@@ -381,11 +381,8 @@
 
         if (!window.cheerpjInit) throw new Error('CheerpJ loader did not initialise');
 
-        try {
-          await window.cheerpjInit({ version: 11, status: 'none' });
-        } catch (_) {
-          await window.cheerpjInit();
-        }
+        // ECJ 3.42 bytecode targets Java 17 - the runtime must match
+        await window.cheerpjInit({ version: 17, status: 'none' });
         window.cheerpjCreateDisplay(consoleEl);
       })();
       cjReadyPromise.catch(() => { cjReadyPromise = null; });
