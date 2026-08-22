@@ -95,6 +95,25 @@ function cleanBlock(arr, opts = {}) {
   return out.join('\n');
 }
 
+// Corrections where the source docx contradicts itself or real Java semantics.
+// Sample output is treated as the spec.
+//
+// Q6: docx lists "Static Block" before "Main Started", but its own predefined
+//     template only references class Demo AFTER printing "Main Started", and
+//     Java loads classes lazily -> static block runs at that point.
+// Q11: docx solution multiplies doubles (50000 * 1.10 == 55000.00000000001),
+//      which cannot reproduce its own sample output "55000.0". Use exact
+//      integer-percentage arithmetic instead.
+const SAMPLE_OUTPUT_OVERRIDES = {
+  6: 'Main Started\nStatic Block\nInstance Block\nConstructor\nInstance Block\nConstructor\nMain Ended',
+};
+
+const SOLUTION_OVERRIDES = {
+  11: code => code
+    .replace('return salary * 1.10;', 'return salary + salary * 10 / 100;')
+    .replace('return salary * 1.20;', 'return salary + salary * 20 / 100;'),
+};
+
 for (let k = 0; k < questions.length; k++) {
   const q = questions[k];
   const start = q.headerIndex + 2; // skip title + diff line
@@ -138,6 +157,9 @@ for (let k = 0; k < questions.length; k++) {
   const tm = timeLine.match(/Time:\s*([^\s💾⏱ ].*(?=\s*💾)|[^\s💾⏱ ]+)/);
   q.timeComplexity = (timeLine.match(/Time:\s*(.+?)(?:\s{2,}|💾|$)/) || [])[1] || '';
   q.spaceComplexity = (timeLine.match(/Space:\s*(.+?)$/) || [])[1] || '';
+
+  if (SAMPLE_OUTPUT_OVERRIDES[q.id]) q.sampleOutput = SAMPLE_OUTPUT_OVERRIDES[q.id];
+  if (SOLUTION_OVERRIDES[q.id]) q.solutionCode = SOLUTION_OVERRIDES[q.id](q.solutionCode);
 
   delete q.headerIndex;
 }
