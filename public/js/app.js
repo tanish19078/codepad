@@ -5,6 +5,7 @@
   const LS_SOLVED = 'codepad.solved.v1';
   const LS_CODE = qid => `codepad.code.q${qid}`;
   const LS_LAST = 'codepad.last.v1';
+  const LS_JDOODLE = 'codepad.jdoodle.v1';
 
   const state = {
     questions: [],
@@ -177,10 +178,7 @@
 
   // ---------- console ----------
   function resetConsole() {
-    $('#consoleTitle').textContent = 'Console';
-    $('#consoleMeta').textContent = '';
-    $('#consoleBody').innerHTML =
-      '<div class="console-hint">Press Run to execute, or Submit to evaluate against the sample tests.</div>';
+    renderConsoleIdle();
   }
 
   function showBusy(button) {
@@ -290,52 +288,132 @@
     savedTimer = setTimeout(() => el.classList.remove('show'), 1200);
   }
 
-  // ---------- execution (local runner or Piston fallback) ----------
-  // Vercel/static hosting has no Java backend, so we execute through the
-  // public Piston API (https://emkc.org) when /api/health is unavailable.
-  let pistonVersion = null;
+  // ---------- execution (local runner, JDoodle, or none) ----------
+  // Vercel/static hosting has no JDK. The public Piston API now requires an
+  // authorization key (not granted for personal projects), so static mode
+  // executes through JDoodle's free tier using credentials the user stores
+  // locally. Local `npm start` mode always uses the bundled JDK runner.
 
-  async function getPistonVersion() {
-    if (pistonVersion) return pistonVersion;
-    const res = await fetch('https://emkc.org/api/v2/piston/runtimes');
-    if (!res.ok) throw new Error('Piston runtimes HTTP ' + res.status);
-    const list = await res.json();
-    const java = list.find(r => r.language === 'java' || (r.aliases || []).includes('java'));
-    pistonVersion = java ? java.version : '15.0.2';
-    return pistonVersion;
+  function getJdoodleCreds() {
+    try { return JSON.parse(localStorage.getItem(LS_JDOODLE) || 'null'); }
+    catch (_) { return null; }
   }
 
-  async function pistonRun(code, stdin = '') {
-    const version = await getPistonVersion();
-    const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+  async function jdoodleExecute(code, stdin = '') {
+    const creds = getJdoodleCreds();
+    if (!creds || !creds.clientId || !creds.clientSecret) {
+      const err = new Error('NO_RUNNER');
+      err.code = 'NO_RUNNER';
+      throw err;
+    }
+    const res = await fetch('https://api.jdoodle.com/v1/execute', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        clientId: creds.clientId,
+        clientSecret: creds.clientSecret,
+        script: code,
         language: 'java',
-        version,
-        files: [{ name: 'Main.java', content: code }],
+        versionIndex: '3',   // JDK 11
         stdin,
-        compile_timeout: 20000,
-        run_timeout: 10000,
       }),
     });
-    if (!res.ok) throw new Error('Piston HTTP ' + res.status);
+    if (!res.ok) {
+      const err = new Error('JDoodle HTTP ' + res.status);
+      err.code = res.status === 401 || res.status === 403 ? 'BAD_CREDS' : 'HTTP';
+      throw err;
+    }
     const data = await res.json();
-    const compileFailed = data.compile && data.compile.code !== 0;
+    if (data.error) throw new Error('JDoodle: ' + (data.error.message || data.error));
+    const failed = data.statusCode && data.statusCode !== 200;
     return {
-      stage: compileFailed ? 'compile' : 'ok',
-      stdout: (data.run && data.run.stdout) || '',
-      stderr: (data.run && data.run.stderr) || '',
-      compileOutput: compileFailed
-        ? ((data.compile.stdout || '') + (data.compile.stderr || '')).trim()
-        : '',
-      timeMs: data.run && typeof data.run.signal === 'undefined' ? null : null,
+      stage: 'ok',
+      stdout: data.output != null ? data.output : '',
+      stderr: '',
+      compileOutput: failed ? data.output || '' : '',
+      timeMs: null,
     };
   }
 
   async function execute(code, stdin) {
     if (state.serverMode) return api('/api/run', { code, stdin });
-    return pistonRun(code, stdin);
+    return jdoodleExecute(code, stdin);
+  }
+
+  /** Client-side judging for static hosting */
+  async function judgeLocally(q, code) {
+    const testcases = [{ input: q.sampleInput, expected: q.sampleOutput }];
+    const norm = t => t
+      .replace(/\r\n?/g, '\n')
+      .split('\n')
+      .map(l => l.replace(/[ \t]+$/, ''))
+      .join('\n')
+      .replace(/\n+$/, '');
+
+    const results = [];
+    for (const tc of testcases) {
+      let r;
+      try {
+        r = await jdoodleExecute(code, tc.input);
+      } catch (err) {
+        return { verdict: err.code === 'NO_RUNNER' ? 'NO_RUNNER' : 'RUN_ERROR', error: err.message, results: [] };
+      }
+      results.push({
+        passed: r.stage === 'ok' && norm(r.stdout) === norm(tc.expected),
+        input: tc.input,
+        expected: tc.expected,
+        actual: r.stdout,
+        stage: r.stage,
+        stderr: r.stderr,
+        compileOutput: r.compileOutput,
+        timeMs: null,
+      });
+    }
+    return { verdict: results.every(r => r.passed) ? 'ACCEPTED' : 'WRONG_ANSWER', results };
+  }
+
+  function configureRunner() {
+    const creds = getJdoodleCreds();
+    const current = creds ? `${creds.clientId.slice(0, 4)}...` : 'none';
+    const choice = prompt(
+      `Java execution for this deployed site uses JDoodle's free API.\n` +
+      `1) Sign up free at https://www.jdoodle.com/compiler-api/\n` +
+      `2) Paste your clientId and clientSecret below.\n\n` +
+      `Current credentials: ${current}\n\n` +
+      `Enter clientId (or leave empty to cancel):`
+    );
+    if (choice === null) return;
+    if (!choice.trim()) return;
+    const secret = prompt('Enter clientSecret:');
+    if (!secret || !secret.trim()) return;
+    localStorage.setItem(LS_JDOODLE, JSON.stringify({ clientId: choice.trim(), clientSecret: secret.trim() }));
+    renderConsoleIdle();
+  }
+
+  function renderConsoleIdle() {
+    $('#consoleTitle').textContent = 'Console';
+    $('#consoleMeta').textContent = '';
+    const body = $('#consoleBody');
+
+    if (state.serverMode) {
+      body.innerHTML = '<div class="console-hint">Runner: local JDK &#10003; &nbsp;·&nbsp; Press Run to execute, or Submit to evaluate against the sample tests.</div>';
+      return;
+    }
+    if (getJdoodleCreds()) {
+      body.innerHTML = '<div class="console-hint">Runner: JDoodle (free tier) &#10003; &nbsp;·&nbsp; Press Run to execute, or Submit to evaluate against the sample tests.</div>';
+      return;
+    }
+    body.innerHTML =
+      `<div class="verdict COMPILE_ERROR">No Java runner on this deployment</div>` +
+      `<pre class="console-pre">Static sites can't run Java directly. Two options:
+
+  1) BEST - run locally with your installed JDK:
+        npm start   ->   http://localhost:3000
+
+  2) Or connect JDoodle's free compiler API:
+        https://www.jdoodle.com/compiler-api/
+        then click the gear button in the toolbar to save your keys
+        (stored only in this browser).</pre>`;
   }
 
   // ---------- actions ----------
@@ -358,38 +436,6 @@
     }
   }
 
-  /** Client-side judging for static hosting: run each testcase through Piston */
-  async function judgeLocally(q, code) {
-    const testcases = [{ input: q.sampleInput, expected: q.sampleOutput }];
-    const norm = t => t
-      .replace(/\r\n?/g, '\n')
-      .split('\n')
-      .map(l => l.replace(/[ \t]+$/, ''))
-      .join('\n')
-      .replace(/\n+$/, '');
-
-    const results = [];
-    for (const tc of testcases) {
-      let r;
-      try {
-        r = await pistonRun(code, tc.input);
-      } catch (err) {
-        return { verdict: 'RUN_ERROR', error: err.message, results: [] };
-      }
-      results.push({
-        passed: r.stage === 'ok' && norm(r.stdout) === norm(tc.expected),
-        input: tc.input,
-        expected: tc.expected,
-        actual: r.stdout,
-        stage: r.stage,
-        stderr: r.stderr,
-        compileOutput: r.compileOutput,
-        timeMs: r.timeMs || null,
-      });
-    }
-    return { verdict: results.every(r => r.passed) ? 'ACCEPTED' : 'WRONG_ANSWER', results };
-  }
-
   async function handleSubmit() {
     const q = currentQuestion();
     if (!q || state.busy) return;
@@ -401,6 +447,14 @@
       const result = state.serverMode
         ? await api('/api/submit', { questionId: q.id, code: editor.getValue() })
         : await judgeLocally(q, editor.getValue());
+      if (result.verdict === 'NO_RUNNER') {
+        renderConsoleIdle();
+        return;
+      }
+      if (result.verdict === 'RUN_ERROR' || result.verdict === 'BAD_CREDS') {
+        $('#consoleBody').innerHTML = `<pre class="console-pre err">Runner error: ${esc(result.error)}</pre>`;
+        return;
+      }
       renderSubmitResult(result, q);
     } catch (err) {
       $('#consoleBody').innerHTML = `<pre class="console-pre err">Request failed: ${esc(err.message)}</pre>`;
@@ -471,6 +525,7 @@
     $('#sidebarToggle').addEventListener('click', () => $('#sidebar').classList.toggle('collapsed'));
     $('#searchBox').addEventListener('input', e => renderSidebar(e.target.value));
     $('#stdinHeader').addEventListener('click', () => $('.stdin-wrap').classList.toggle('collapsed'));
+    $('#runnerBtn').addEventListener('click', configureRunner);
 
     window.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') e.preventDefault();

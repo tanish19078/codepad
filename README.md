@@ -68,6 +68,20 @@ npm run parse      # tools/docx_text.txt -> public/questions.json
 The source docx contains two self-contradictions which are fixed by documented
 overrides in `tools/parse.js` (Q6 class-loading order, Q11 double precision).
 
+## Deployment notes
+
+**Local mode** (`npm start`) always executes Java with your installed JDK —
+no configuration needed.
+
+**Static hosting (Vercel)** has no Java runtime, and the public Piston API now
+requires authorization (not issued for personal projects since Feb 2026). On a
+static deployment CodePad therefore uses [JDoodle's](https://www.jdoodle.com/compiler-api/)
+free tier: sign up, click the gear icon in the toolbar, paste your
+clientId/clientSecret — stored only in your browser's localStorage.
+
+Progress, saved code per question, completion state, and the last-open question
+all persist in localStorage regardless of hosting mode.
+
 ## Notes
 
 - Judging compares normalized text (CRLF-insensitive, trailing whitespace ignored)
