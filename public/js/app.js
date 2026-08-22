@@ -400,13 +400,13 @@
     window.cheerpOSAddStringFile('/str/Harness.java', HARNESS_SOURCE);
     window.cheerpOSAddStringFile('/str/input.txt', stdin || '');
 
-    // Compile via precompiled harness jar that drives the bundled JDK8 javac
-    // (com.sun.tools.javac.Main.compile) and captures diagnostics into a
-    // virtual file - reliable, unlike scraping the hidden display div.
+    // Compile exactly like JavaFiddle: sources from /str, classes to /files/
+    // root, compiler jar + output dir both on the classpath. Diagnostics are
+    // captured by CompileHarness into a virtual file.
     const compileExit = await window.cheerpjRunMain(
       'CompileHarness',
       '/app/cheerpj/harness.jar:/app/cheerpj/tools.jar',
-      '-nowarn', '-d', '/files/work/classes', '/str/Main.java', '/str/Harness.java'
+      '-nowarn', '-d', '/files/', '/str/Main.java', '/str/Harness.java'
     );
 
     const compileLog = await readVFile('/files/work/compile.log');
@@ -424,18 +424,37 @@
       };
     }
 
-    const runExit = await window.cheerpjRunMain('Harness', '/files/work/classes');
-
-    let raw = '';
-    if (runExit === 0) raw = await readVFile('/files/work/output.txt');
-
-    const nl = raw.indexOf('\n');
-    const exitMarker = nl === -1 ? '' : raw.slice(0, nl).trim();
-    const stdout = nl === -1 ? '' : raw.slice(nl + 1);
+    // Same classpath recipe as the compile step plus /files/ for the
+    // freshly compiled classes (JavaFiddle-proven layout).
+    const RUN_CP = '/app/cheerpj/harness.jar:/app/cheerpj/tools.jar:/files/';
+    const runExit = await window.cheerpjRunMain('Harness', RUN_CP);
 
     let stderr = '';
-    if (runExit !== 0 && exitMarker !== '1' && exitMarker !== '0') {
-      stderr = 'Time Limit Exceeded (15s) or abnormal termination (exit ' + runExit + ')';
+    let stdout = '';
+    let sawMarker = false;
+
+    const raw = await readVFile('/files/work/output.txt', 4);
+    if (raw) {
+      const nl = raw.indexOf('\n');
+      if (nl !== -1) {
+        sawMarker = true;
+        if (raw.slice(0, nl).trim() !== '0') {
+          stderr = 'Program exited with an error - see output below.';
+          stdout = raw.slice(nl + 1);
+        } else {
+          stdout = raw.slice(nl + 1);
+        }
+      }
+    }
+
+    if (!sawMarker) {
+      // Harness never wrote its result: surface whatever the JVM printed into
+      // the hidden display div (e.g. "Could not find or load main class").
+      await new Promise(r => setTimeout(r, 300));
+      const display = document.getElementById('cheerpj-display');
+      const jvmMsg = display ? display.innerText.trim() : '';
+      stderr = 'Time Limit Exceeded (15s) or abnormal termination (exit ' + runExit + ')'
+        + (jvmMsg ? '\n\nJVM said:\n' + jvmMsg.slice(-800) : '');
     }
 
     return {
