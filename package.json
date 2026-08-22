@@ -1,0 +1,14 @@
+{
+  "name": "codepad",
+  "version": "1.0.0",
+  "description": "Local Java OOPS practice platform - question bank on the left, live code editor with Run/Submit on the right",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "parse": "node tools/parse.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
