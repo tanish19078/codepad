@@ -314,13 +314,14 @@
       return;
     }
 
-    editor = new CodeEditor($('#editor'), {
-      onChange: code => {
-        const q = currentQuestion();
-        if (q) saveCode(q, code);
-      },
-      onRunShortcut: handleRun,
-    });
+    try {
+      editor = new CodeEditor($('#editor'), {
+        onChange: code => {
+          const q = currentQuestion();
+          if (q) saveCode(q, code);
+        },
+        onRunShortcut: handleRun,
+      });
 
     // initial question: from hash (#q7), first unsolved, or Q1
     const hashMatch = (location.hash.match(/^#q(\d+)$/) || [])[1];
@@ -350,7 +351,14 @@
     window.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') e.preventDefault();
     });
+    } catch (err) {
+      console.error('init failed:', err);
+      const pane = $('#questionPane');
+      if (pane) {
+        pane.innerHTML = `<div class="pane-empty" style="color:#f85149">App failed to start: ${esc(err.message)}</div>`;
+      }
+    }
   }
 
-  init();
+  init().catch(err => console.error('unhandled init error:', err));
 })();

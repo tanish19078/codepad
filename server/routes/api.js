@@ -39,13 +39,7 @@ function normalize(text) {
 
 async function handleApi(req, res) {
   if (req.method === 'GET' && req.url === '/api/questions') {
-    sendJson(res, 200, questions.map(q => ({
-      id: q.id,
-      title: q.title,
-      difficulty: q.difficulty,
-      concept: q.concept,
-      section: q.section,
-    })));
+    sendJson(res, 200, questions);
     return;
   }
 
