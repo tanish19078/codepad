@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodePad · Java OOPS Practice</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <button id="sidebarToggle" class="icon-btn" title="Toggle question list">&#9776;</button>
+    <div class="brand">
+      <span class="brand-logo">{}</span>
+      <span class="brand-name">Code<span class="accent">Pad</span></span>
+      <span class="brand-sub">Java OOPS Practice</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+      <span id="progressText" class="progress-text">0 / 40 solved</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Question list -->
+    <aside id="sidebar" class="sidebar">
+      <input id="searchBox" type="text" class="search-box" placeholder="Search questions..." autocomplete="off" />
+      <nav id="questionList" class="question-list"><!-- rendered by app.js --></nav>
+    </aside>
+
+    <!-- Question detail -->
+    <section id="questionPane" class="question-pane">
+      <div class="pane-empty">Select a question to begin</div>
+    </section>
+
+    <!-- Editor workspace -->
+    <section class="workspace">
+      <div class="editor-toolbar">
+        <span id="fileName" class="file-name">Main.java</span>
+        <div class="toolbar-actions">
+          <button id="resetBtn" class="btn btn-ghost" title="Restore predefined code">Reset</button>
+          <button id="formatBtn" class="btn btn-ghost" title="Re-indent selection">Indent</button>
+          <button id="runBtn" class="btn btn-run" title="Ctrl+Enter">&#9654; Run</button>
+          <button id="submitBtn" class="btn btn-submit" title="Run against sample tests">Submit &#10003;</button>
+        </div>
+      </div>
+
+      <div id="editor" class="editor"></div>
+
+      <div class="stdin-wrap">
+        <div class="stdin-header" id="stdinHeader">
+          <span>Custom Input (stdin)</span>
+          <span id="stdinChevron" class="chevron">&#9660;</span>
+        </div>
+        <textarea id="stdinBox" spellcheck="false" placeholder="Preloaded with the sample input"></textarea>
+      </div>
+
+      <div class="console-wrap">
+        <div class="console-header">
+          <span id="consoleTitle">Console</span>
+          <span id="consoleMeta"></span>
+        </div>
+        <div id="consoleBody" class="console-body">
+          <div class="console-hint">Press Run to execute, or Submit to evaluate against the sample tests.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/editor.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
