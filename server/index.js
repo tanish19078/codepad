@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleApi } = require('./routes/api');
+const { detectToolchains } = require('./services/local-runner');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
@@ -38,7 +39,6 @@ function serveStatic(req, res) {
 }
 
 const server = http.createServer((req, res) => {
-  // allow the deployed site to use this machine's JDK as a runner
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -61,5 +61,10 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n  CodePad running -> http://localhost:${PORT}\n`);
+  const tc = detectToolchains();
+  console.log(`\n  ⚡ ForgeJudge Local Execution Engine -> http://localhost:${PORT}`);
+  console.log(`  ├─ Java:       ${tc.java.available ? tc.java.version : 'Not found'}`);
+  console.log(`  ├─ C++ (g++):  ${tc.cpp.available ? tc.cpp.version : 'Not found'}`);
+  console.log(`  ├─ Python:     ${tc.python.available ? tc.python.version : 'Not found'}`);
+  console.log(`  └─ JavaScript: ${tc.javascript.available ? tc.javascript.version : 'Not found'}\n`);
 });
