@@ -1,0 +1,762 @@
+[
+  {
+    "id": 1,
+    "title": "Employee ID Generator",
+    "difficulty": "MEDIUM",
+    "concept": "Static variable, static method, constructor",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Employee {\n\n    static int nextId = 1001;\n    static int count = 0;\n\n    int id;\n    String name;\n\n    Employee(String name) {\n        // Write your code here\n    }\n\n    static int getTotalEmployees() {\n        // Write your code here\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++) {\n\n            String name = sc.next();\n\n            Employee emp = new Employee(name);\n\n            System.out.println(\n                    emp.id + \" \" + emp.name);\n        }\n\n        System.out.println(\n                \"Total Employees: \"\n                + Employee.getTotalEmployees());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Employee {\n\n    static int nextId = 1001;\n    static int count = 0;\n\n    int id;\n    String name;\n\n    Employee(String name) {\n\n        this.name = name;\n        this.id = nextId;\n\n        nextId++;\n        count++;\n    }\n\n    static int getTotalEmployees() {\n\n        return count;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++) {\n\n            String name = sc.next();\n\n            Employee emp = new Employee(name);\n\n            System.out.println(\n                    emp.id + \" \" + emp.name);\n        }\n\n        System.out.println(\n                \"Total Employees: \"\n                + Employee.getTotalEmployees());\n    }\n}",
+    "sampleInput": "3\nAlice\nBob\nCharlie",
+    "sampleOutput": "1001 Alice\n1002 Bob\n1003 Charlie\nTotal Employees: 3",
+    "statement": "Create an Employee class that generates a unique employee ID for every employee. The first employee must receive ID 1001, the next 1002, and so on. Use a static variable to maintain the ID and another static variable to count the total number of employees.",
+    "constraints": "1 <= N <= 1000\n1 <= name.length() <= 50\nName contains only alphabets.\nInitial ID is 1001.",
+    "explanation": "nextId is static, so it is shared among all employee objects. For every object: (1) Assign nextId to id, (2) Increment nextId, (3) Increment employee count.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1) excluding input storage"
+  },
+  {
+    "id": 2,
+    "title": "Bank Account Generator",
+    "difficulty": "MEDIUM",
+    "concept": "Static variable",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass BankAccount {\n\n    static int nextAccount = 5001;\n\n    String name;\n    int accountNumber;\n\n    BankAccount(String name) {\n        // Write your code here\n    }\n\n    void display() {\n        // Write your code here\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++) {\n\n            BankAccount account =\n                    new BankAccount(sc.next());\n\n            account.display();\n        }\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass BankAccount {\n\n    static int nextAccount = 5001;\n\n    String name;\n    int accountNumber;\n\n    BankAccount(String name) {\n\n        this.name = name;\n        this.accountNumber = nextAccount++;\n    }\n\n    void display() {\n\n        System.out.println(\n                \"ACC\" + accountNumber\n                + \" \" + name);\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++) {\n\n            BankAccount account =\n                    new BankAccount(sc.next());\n\n            account.display();\n        }\n    }\n}",
+    "sampleInput": "4\nAlice\nBob\nJohn\nDavid",
+    "sampleOutput": "ACC5001 Alice\nACC5002 Bob\nACC5003 John\nACC5004 David",
+    "statement": "Generate unique bank account numbers starting from 5001.",
+    "constraints": "1 <= N <= 1000\nName length: 1-50",
+    "explanation": "nextAccount belongs to the class rather than an individual object. Therefore, every object receives a different account number.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 3,
+    "title": "Static Block Configuration",
+    "difficulty": "MEDIUM",
+    "concept": "Static block",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Company {\n\n    static String companyName;\n    static int baseEmployees;\n\n    static {\n        // Initialize values\n    }\n\n    static void display(int newEmployees) {\n        // Write your code here\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        Company.display(n);\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Company {\n\n    static String companyName;\n    static int baseEmployees;\n\n    static {\n\n        companyName = \"ByteXL\";\n        baseEmployees = 100;\n    }\n\n    static void display(int newEmployees) {\n\n        System.out.println(\n                \"Company: \" + companyName);\n\n        System.out.println(\n                \"Employees: \"\n                + (baseEmployees + newEmployees));\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        Company.display(n);\n    }\n}",
+    "sampleInput": "25",
+    "sampleOutput": "Company: ByteXL\nEmployees: 125",
+    "statement": "Use a static block to initialize: Company name = ByteXL, Base employees = 100. The input represents newly joined employees.",
+    "constraints": "0 <= newEmployees <= 10000",
+    "explanation": "The static block executes automatically when the Company class is loaded.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 4,
+    "title": "Product Discount Calculator",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Static variable and method",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Product {\n\n    static double discount;\n\n    static void setDiscount(double d) {\n        // Write your code\n    }\n\n    static double calculatePrice(double price) {\n        // Write your code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        double[] prices = new double[n];\n\n        for (int i = 0; i < n; i++)\n            prices[i] = sc.nextDouble();\n\n        double discount = sc.nextDouble();\n\n        Product.setDiscount(discount);\n\n        for (double price : prices)\n            System.out.println(\n                    Product.calculatePrice(price));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Product {\n\n    static double discount;\n\n    static void setDiscount(double d) {\n\n        discount = d;\n    }\n\n    static double calculatePrice(double price) {\n\n        return price - (price * discount / 100);\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        double[] prices = new double[n];\n\n        for (int i = 0; i < n; i++)\n            prices[i] = sc.nextDouble();\n\n        double discount = sc.nextDouble();\n\n        Product.setDiscount(discount);\n\n        for (double price : prices)\n            System.out.println(\n                    Product.calculatePrice(price));\n    }\n}",
+    "sampleInput": "3\n1000\n2500\n5000\n10",
+    "sampleOutput": "900.0\n2250.0\n4500.0",
+    "statement": "All products receive the same discount percentage. Store the discount in a static variable and calculate the final price using a static method.",
+    "constraints": "1 <= N <= 1000\n0 <= price <= 10^6\n0 <= discount <= 100",
+    "explanation": "Discount amount = price × discount / 100. Final price = price - discount amount.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 5,
+    "title": "Object Counter",
+    "difficulty": "MEDIUM",
+    "concept": "Static variable",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Counter {\n\n    static int count = 0;\n\n    Counter() {\n        // Write your code\n    }\n\n    static int getCount() {\n        // Write your code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++)\n            new Counter();\n\n        System.out.println(\n                \"Objects Created: \"\n                + Counter.getCount());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Counter {\n\n    static int count = 0;\n\n    Counter() {\n        count++;\n    }\n\n    static int getCount() {\n        return count;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++)\n            new Counter();\n\n        System.out.println(\n                \"Objects Created: \"\n                + Counter.getCount());\n    }\n}",
+    "sampleInput": "5",
+    "sampleOutput": "Objects Created: 5",
+    "statement": "Count the total number of objects created using a static variable.",
+    "constraints": "1 <= N <= 100000",
+    "explanation": "Every constructor execution increments the same static count.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 6,
+    "title": "Static and Instance Initialization Order",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Static block vs instance block vs constructor",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Demo {\n\n    static {\n        // Write code\n    }\n\n    {\n        // Write code\n    }\n\n    Demo() {\n        // Write code\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        System.out.println(\"Main Started\");\n\n        for (int i = 0; i < n; i++)\n            new Demo();\n\n        System.out.println(\"Main Ended\");\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Demo {\n\n    static {\n        System.out.println(\"Static Block\");\n    }\n\n    {\n        System.out.println(\"Instance Block\");\n    }\n\n    Demo() {\n        System.out.println(\"Constructor\");\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        System.out.println(\"Main Started\");\n\n        for (int i = 0; i < n; i++)\n            new Demo();\n\n        System.out.println(\"Main Ended\");\n    }\n}",
+    "sampleInput": "2",
+    "sampleOutput": "Main Started\nStatic Block\nInstance Block\nConstructor\nInstance Block\nConstructor\nMain Ended",
+    "statement": "Demonstrate the execution order of: (1) Static block, (2) Main method, (3) Instance block, (4) Constructor.",
+    "constraints": "1 <= N <= 100",
+    "explanation": "The static block executes only once when the class is loaded. The instance block and constructor execute every time an object is created.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 7,
+    "title": "Static Tax Calculator",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Static members",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass TaxCalculator {\n\n    static double taxRate;\n\n    static void setTaxRate(double rate) {\n        // Write code\n    }\n\n    static double calculateTax(double salary) {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        double[] salaries = new double[n];\n\n        for (int i = 0; i < n; i++)\n            salaries[i] = sc.nextDouble();\n\n        double rate = sc.nextDouble();\n\n        TaxCalculator.setTaxRate(rate);\n\n        for (double salary : salaries)\n            System.out.println(\n                    \"Tax: \"\n                    + TaxCalculator.calculateTax(salary));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass TaxCalculator {\n\n    static double taxRate;\n\n    static void setTaxRate(double rate) {\n        taxRate = rate;\n    }\n\n    static double calculateTax(double salary) {\n        return salary * taxRate / 100;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        double[] salaries = new double[n];\n\n        for (int i = 0; i < n; i++)\n            salaries[i] = sc.nextDouble();\n\n        double rate = sc.nextDouble();\n\n        TaxCalculator.setTaxRate(rate);\n\n        for (double salary : salaries)\n            System.out.println(\n                    \"Tax: \"\n                    + TaxCalculator.calculateTax(salary));\n    }\n}",
+    "sampleInput": "2\n50000\n80000\n10",
+    "sampleOutput": "Tax: 5000.0\nTax: 8000.0",
+    "statement": "Create a static tax rate applicable to all employees. Calculate tax for every salary.",
+    "constraints": "1 <= N <= 10000\n0 <= salary <= 10^9\n0 <= taxRate <= 100",
+    "explanation": "Tax is calculated as salary × taxRate / 100.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 8,
+    "title": "Static Prime Utility",
+    "difficulty": "MEDIUM",
+    "concept": "Static method",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass NumberUtility {\n\n    static boolean isPrime(int n) {\n        // Write code\n        return false;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        while (n-- > 0) {\n\n            int value = sc.nextInt();\n\n            System.out.println(\n                    NumberUtility.isPrime(value)\n                    ? \"Prime\"\n                    : \"Not Prime\");\n        }\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass NumberUtility {\n\n    static boolean isPrime(int n) {\n\n        if (n < 2)\n            return false;\n\n        for (int i = 2; i * i <= n; i++) {\n\n            if (n % i == 0)\n                return false;\n        }\n\n        return true;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        while (n-- > 0) {\n\n            int value = sc.nextInt();\n\n            System.out.println(\n                    NumberUtility.isPrime(value)\n                    ? \"Prime\"\n                    : \"Not Prime\");\n        }\n    }\n}",
+    "sampleInput": "5\n11\n15\n17\n21\n29",
+    "sampleOutput": "Prime\nNot Prime\nPrime\nNot Prime\nPrime",
+    "statement": "Create a utility class containing a static method isPrime().",
+    "constraints": "1 <= N <= 10000\n1 <= number <= 10^9",
+    "explanation": "A number is prime if it has no divisor between 2 and sqrt(n).",
+    "timeComplexity": "O(N√M)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 9,
+    "title": "Static Configuration Manager",
+    "difficulty": "HARD",
+    "concept": "Static block + static method",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Configuration {\n\n    static String environment;\n    static int maxUsers;\n\n    static {\n        // Initialize default configuration\n    }\n\n    static void update(String env, int users) {\n        // Write code\n    }\n\n    static void display() {\n        // Write code\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String environment = sc.next();\n        int users = sc.nextInt();\n\n        Configuration.update(\n                environment, users);\n\n        Configuration.display();\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Configuration {\n\n    static String environment;\n    static int maxUsers;\n\n    static {\n\n        environment = \"Development\";\n        maxUsers = 100;\n    }\n\n    static void update(\n            String env, int users) {\n\n        environment = env;\n        maxUsers = users;\n    }\n\n    static void display() {\n\n        System.out.println(\n                \"Environment: \"\n                + environment);\n\n        System.out.println(\n                \"Max Users: \"\n                + maxUsers);\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String environment = sc.next();\n        int users = sc.nextInt();\n\n        Configuration.update(\n                environment, users);\n\n        Configuration.display();\n    }\n}",
+    "sampleInput": "Production\n500",
+    "sampleOutput": "Environment: Production\nMax Users: 500",
+    "statement": "Use a static block to initialize default application configuration: Environment = Development, MaxUsers = 100. Then update the configuration using a static method.",
+    "constraints": "Environment length: 1-20\n1 <= maxUsers <= 10^9",
+    "explanation": "The static block provides default configuration. The static update() method modifies the shared class-level values.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 10,
+    "title": "Static Employee Salary Statistics",
+    "difficulty": "HARD",
+    "concept": "Static members",
+    "section": {
+      "name": "Section A",
+      "title": "Static Members & Static Blocks"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Employee {\n\n    static int count = 0;\n    static double totalSalary = 0;\n\n    double salary;\n\n    Employee(double salary) {\n        // Write code\n    }\n\n    static double getAverageSalary() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++)\n            new Employee(sc.nextDouble());\n\n        System.out.println(\n                \"Average Salary: \"\n                + Employee.getAverageSalary());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Employee {\n\n    static int count = 0;\n    static double totalSalary = 0;\n\n    double salary;\n\n    Employee(double salary) {\n\n        this.salary = salary;\n\n        count++;\n        totalSalary += salary;\n    }\n\n    static double getAverageSalary() {\n\n        return totalSalary / count;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++)\n            new Employee(sc.nextDouble());\n\n        System.out.println(\n                \"Average Salary: \"\n                + Employee.getAverageSalary());\n    }\n}",
+    "sampleInput": "4\n30000\n40000\n50000\n60000",
+    "sampleOutput": "Average Salary: 45000.0",
+    "statement": "Create an Employee class where: every employee stores an individual salary, a static variable stores total salary, a static variable stores employee count, and a static method returns average salary.",
+    "constraints": "1 <= N <= 100000\n0 <= salary <= 10^9",
+    "explanation": "Every object updates the shared count and totalSalary. average = totalSalary / count.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 11,
+    "title": "Employee Salary Using Runtime Polymorphism",
+    "difficulty": "MEDIUM",
+    "concept": "Method overriding, runtime polymorphism",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Employee {\n\n    double salary;\n\n    Employee(double salary) {\n        this.salary = salary;\n    }\n\n    double calculateSalary() {\n        return 0;\n    }\n}\n\nclass Developer extends Employee {\n\n    Developer(double salary) {\n        super(salary);\n    }\n\n    @Override\n    double calculateSalary() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Manager extends Employee {\n\n    Manager(double salary) {\n        super(salary);\n    }\n\n    @Override\n    double calculateSalary() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double salary = sc.nextDouble();\n\n        Employee employee;\n\n        if (type.equals(\"Developer\"))\n            employee = new Developer(salary);\n        else\n            employee = new Manager(salary);\n\n        System.out.println(\n                \"Final Salary: \"\n                + employee.calculateSalary());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Employee {\n\n    double salary;\n\n    Employee(double salary) {\n        this.salary = salary;\n    }\n\n    double calculateSalary() {\n        return salary;\n    }\n}\n\nclass Developer extends Employee {\n\n    Developer(double salary) {\n        super(salary);\n    }\n\n    @Override\n    double calculateSalary() {\n        return salary + salary * 10 / 100;\n    }\n}\n\nclass Manager extends Employee {\n\n    Manager(double salary) {\n        super(salary);\n    }\n\n    @Override\n    double calculateSalary() {\n        return salary + salary * 20 / 100;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double salary = sc.nextDouble();\n\n        Employee employee;\n\n        if (type.equals(\"Developer\"))\n            employee = new Developer(salary);\n        else\n            employee = new Manager(salary);\n\n        System.out.println(\n                \"Final Salary: \"\n                + employee.calculateSalary());\n    }\n}",
+    "sampleInput": "Developer\n50000",
+    "sampleOutput": "Final Salary: 55000.0",
+    "statement": "Create a base Employee class. Developer gets 10% bonus. Manager gets 20% bonus. Override calculateSalary().",
+    "constraints": "Salary: 0-10^9\nType is either Developer or Manager.",
+    "explanation": "The reference variable is of type Employee, but the actual object is Developer. Therefore Java invokes the overridden calculateSalary() method at runtime.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 12,
+    "title": "Shape Area Using Abstraction",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Abstract class",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nabstract class Shape {\n\n    abstract double area();\n}\n\nclass Circle extends Shape {\n\n    Circle(double radius) {\n        // Write code\n    }\n\n    double area() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Rectangle extends Shape {\n\n    Rectangle(double l, double w) {\n        // Write code\n    }\n\n    double area() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Triangle extends Shape {\n\n    Triangle(double b, double h) {\n        // Write code\n    }\n\n    double area() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n\n        Shape shape;\n\n        if (type.equals(\"Circle\"))\n            shape = new Circle(sc.nextDouble());\n\n        else if (type.equals(\"Rectangle\"))\n            shape = new Rectangle(\n                    sc.nextDouble(),\n                    sc.nextDouble());\n\n        else\n            shape = new Triangle(\n                    sc.nextDouble(),\n                    sc.nextDouble());\n\n        System.out.println(\n                \"Area: \" + shape.area());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nabstract class Shape {\n\n    abstract double area();\n}\n\nclass Circle extends Shape {\n\n    double radius;\n\n    Circle(double radius) {\n        this.radius = radius;\n    }\n\n    double area() {\n        return 3.14 * radius * radius;\n    }\n}\n\nclass Rectangle extends Shape {\n\n    double length, width;\n\n    Rectangle(double l, double w) {\n        length = l;\n        width = w;\n    }\n\n    double area() {\n        return length * width;\n    }\n}\n\nclass Triangle extends Shape {\n\n    double base, height;\n\n    Triangle(double b, double h) {\n        base = b;\n        height = h;\n    }\n\n    double area() {\n        return 0.5 * base * height;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n\n        Shape shape;\n\n        if (type.equals(\"Circle\"))\n            shape = new Circle(sc.nextDouble());\n\n        else if (type.equals(\"Rectangle\"))\n            shape = new Rectangle(\n                    sc.nextDouble(),\n                    sc.nextDouble());\n\n        else\n            shape = new Triangle(\n                    sc.nextDouble(),\n                    sc.nextDouble());\n\n        System.out.println(\n                \"Area: \" + shape.area());\n    }\n}",
+    "sampleInput": "Triangle\n10\n5",
+    "sampleOutput": "Area: 25.0",
+    "statement": "Create an abstract class Shape. Implement Circle, Rectangle, and Triangle. Each class must implement area().",
+    "constraints": "Dimensions are positive.\n0 < radius, length, width, base, height <= 10^6",
+    "explanation": "Shape defines what every shape must provide, but does not specify how the area is calculated. Each subclass provides its own implementation.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 13,
+    "title": "Payment System Using Interface",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Interface implementation",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\ninterface Payment {\n\n    void pay(double amount);\n}\n\nclass UPI implements Payment {\n\n    public void pay(double amount) {\n        // Write code\n    }\n}\n\nclass CreditCard implements Payment {\n\n    public void pay(double amount) {\n        // Write code\n    }\n}\n\nclass NetBanking implements Payment {\n\n    public void pay(double amount) {\n        // Write code\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double amount = sc.nextDouble();\n\n        Payment payment;\n\n        if (type.equals(\"UPI\"))\n            payment = new UPI();\n\n        else if (type.equals(\"CreditCard\"))\n            payment = new CreditCard();\n\n        else\n            payment = new NetBanking();\n\n        payment.pay(amount);\n    }\n}",
+    "solutionCode": "import java.util.*;\n\ninterface Payment {\n\n    void pay(double amount);\n}\n\nclass UPI implements Payment {\n\n    public void pay(double amount) {\n\n        System.out.println(\n                \"Paid \" + amount + \" using UPI\");\n    }\n}\n\nclass CreditCard implements Payment {\n\n    public void pay(double amount) {\n\n        System.out.println(\n                \"Paid \" + amount\n                + \" using Credit Card\");\n    }\n}\n\nclass NetBanking implements Payment {\n\n    public void pay(double amount) {\n\n        System.out.println(\n                \"Paid \" + amount\n                + \" using NetBanking\");\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double amount = sc.nextDouble();\n\n        Payment payment;\n\n        if (type.equals(\"UPI\"))\n            payment = new UPI();\n\n        else if (type.equals(\"CreditCard\"))\n            payment = new CreditCard();\n\n        else\n            payment = new NetBanking();\n\n        payment.pay(amount);\n    }\n}",
+    "sampleInput": "UPI\n2500",
+    "sampleOutput": "Paid 2500.0 using UPI",
+    "statement": "Create a Payment interface and implement UPI, CreditCard, and NetBanking.",
+    "constraints": "0 <= amount <= 10^9\nPayment type is valid.",
+    "explanation": "The interface defines a common pay() contract. Each implementation decides how the payment is performed.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 14,
+    "title": "Vehicle Hierarchy",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Inheritance, method overriding",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Vehicle {\n\n    double calculateMileage() {\n        return 0;\n    }\n}\n\nclass Car extends Vehicle {\n\n    @Override\n    double calculateMileage() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Bike extends Vehicle {\n\n    @Override\n    double calculateMileage() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Truck extends Vehicle {\n\n    @Override\n    double calculateMileage() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n\n        Vehicle vehicle;\n\n        if (type.equals(\"Car\"))\n            vehicle = new Car();\n\n        else if (type.equals(\"Bike\"))\n            vehicle = new Bike();\n\n        else\n            vehicle = new Truck();\n\n        System.out.println(\n                \"Mileage: \"\n                + vehicle.calculateMileage());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Vehicle {\n\n    double calculateMileage() {\n        return 0;\n    }\n}\n\nclass Car extends Vehicle {\n\n    @Override\n    double calculateMileage() {\n        return 18;\n    }\n}\n\nclass Bike extends Vehicle {\n\n    @Override\n    double calculateMileage() {\n        return 45;\n    }\n}\n\nclass Truck extends Vehicle {\n\n    @Override\n    double calculateMileage() {\n        return 8;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n\n        Vehicle vehicle;\n\n        if (type.equals(\"Car\"))\n            vehicle = new Car();\n\n        else if (type.equals(\"Bike\"))\n            vehicle = new Bike();\n\n        else\n            vehicle = new Truck();\n\n        System.out.println(\n                \"Mileage: \"\n                + vehicle.calculateMileage());\n    }\n}",
+    "sampleInput": "Bike",
+    "sampleOutput": "Mileage: 45.0",
+    "statement": "Create a base class Vehicle and subclasses: Car (18 km/l), Bike (45 km/l), Truck (8 km/l). Override calculateMileage().",
+    "constraints": "Type is one of the three specified types.",
+    "explanation": "The same reference type Vehicle can point to different subclass objects.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 15,
+    "title": "Notification System",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Interface implementation",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\ninterface Notification {\n\n    void send(String message);\n}\n\nclass Email implements Notification {\n\n    public void send(String message) {\n        // Write code\n    }\n}\n\nclass SMS implements Notification {\n\n    public void send(String message) {\n        // Write code\n    }\n}\n\nclass Push implements Notification {\n\n    public void send(String message) {\n        // Write code\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        sc.nextLine();\n\n        String message = sc.nextLine();\n\n        Notification notification;\n\n        if (type.equals(\"Email\"))\n            notification = new Email();\n\n        else if (type.equals(\"SMS\"))\n            notification = new SMS();\n\n        else\n            notification = new Push();\n\n        notification.send(message);\n    }\n}",
+    "solutionCode": "import java.util.*;\n\ninterface Notification {\n\n    void send(String message);\n}\n\nclass Email implements Notification {\n\n    public void send(String message) {\n\n        System.out.println(\n                \"Email: \" + message);\n    }\n}\n\nclass SMS implements Notification {\n\n    public void send(String message) {\n\n        System.out.println(\n                \"SMS: \" + message);\n    }\n}\n\nclass Push implements Notification {\n\n    public void send(String message) {\n\n        System.out.println(\n                \"Push: \" + message);\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        sc.nextLine();\n\n        String message = sc.nextLine();\n\n        Notification notification;\n\n        if (type.equals(\"Email\"))\n            notification = new Email();\n\n        else if (type.equals(\"SMS\"))\n            notification = new SMS();\n\n        else\n            notification = new Push();\n\n        notification.send(message);\n    }\n}",
+    "sampleInput": "SMS\nYour OTP is 123456",
+    "sampleOutput": "SMS: Your OTP is 123456",
+    "statement": "Create a Notification interface with implementations: Email, SMS, Push.",
+    "constraints": "Message length: 1-500\nType is valid.",
+    "explanation": "The interface provides abstraction and allows different notification classes to follow the same contract.",
+    "timeComplexity": "O(L) where L is message length",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 16,
+    "title": "Abstract Employee Bonus",
+    "difficulty": "HARD",
+    "concept": "Abstract class",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nabstract class Employee {\n\n    double salary;\n\n    Employee(double salary) {\n        this.salary = salary;\n    }\n\n    abstract double calculateBonus();\n}\n\nclass Developer extends Employee {\n\n    Developer(double salary) {\n        super(salary);\n    }\n\n    double calculateBonus() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Manager extends Employee {\n\n    Manager(double salary) {\n        super(salary);\n    }\n\n    double calculateBonus() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double salary = sc.nextDouble();\n\n        Employee emp;\n\n        if (type.equals(\"Developer\"))\n            emp = new Developer(salary);\n        else\n            emp = new Manager(salary);\n\n        System.out.println(\n                \"Bonus: \"\n                + emp.calculateBonus());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nabstract class Employee {\n\n    double salary;\n\n    Employee(double salary) {\n        this.salary = salary;\n    }\n\n    abstract double calculateBonus();\n}\n\nclass Developer extends Employee {\n\n    Developer(double salary) {\n        super(salary);\n    }\n\n    double calculateBonus() {\n        return salary * 0.15;\n    }\n}\n\nclass Manager extends Employee {\n\n    Manager(double salary) {\n        super(salary);\n    }\n\n    double calculateBonus() {\n        return salary * 0.25;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double salary = sc.nextDouble();\n\n        Employee emp;\n\n        if (type.equals(\"Developer\"))\n            emp = new Developer(salary);\n        else\n            emp = new Manager(salary);\n\n        System.out.println(\n                \"Bonus: \"\n                + emp.calculateBonus());\n    }\n}",
+    "sampleInput": "Manager\n80000",
+    "sampleOutput": "Bonus: 20000.0",
+    "statement": "Create an abstract Employee class. Developer bonus = 15%. Manager bonus = 25%.",
+    "constraints": "0 <= salary <= 10^9",
+    "explanation": "Because calculateBonus() is abstract, each subclass must implement its own bonus logic.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 17,
+    "title": "Multiple Interfaces",
+    "difficulty": "HARD",
+    "concept": "Implementing multiple interfaces",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "interface Printable {\n\n    void print();\n}\n\ninterface Scannable {\n\n    void scan();\n}\n\nclass Printer implements Printable, Scannable {\n\n    public void print() {\n        // Write code\n    }\n\n    public void scan() {\n        // Write code\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Printer printer = new Printer();\n\n        printer.print();\n        printer.scan();\n    }\n}",
+    "solutionCode": "interface Printable {\n\n    void print();\n}\n\ninterface Scannable {\n\n    void scan();\n}\n\nclass Printer implements Printable, Scannable {\n\n    public void print() {\n\n        System.out.println(\n                \"Printing document\");\n    }\n\n    public void scan() {\n\n        System.out.println(\n                \"Scanning document\");\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Printer printer = new Printer();\n\n        printer.print();\n        printer.scan();\n    }\n}",
+    "sampleInput": "No input",
+    "sampleOutput": "Printing document\nScanning document",
+    "statement": "Create two interfaces: Printable, Scannable. Create a Printer class that implements both.",
+    "constraints": "No additional input required.",
+    "explanation": "Java does not support multiple inheritance through classes, but a class can implement multiple interfaces.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 18,
+    "title": "Banking Polymorphism",
+    "difficulty": "HARD",
+    "concept": "Inheritance, runtime polymorphism",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Account {\n\n    double balance;\n\n    Account(double balance) {\n        this.balance = balance;\n    }\n\n    double calculateInterest() {\n        return 0;\n    }\n}\n\nclass SavingsAccount extends Account {\n\n    SavingsAccount(double balance) {\n        super(balance);\n    }\n\n    @Override\n    double calculateInterest() {\n        // Write code\n        return 0;\n    }\n}\n\nclass CurrentAccount extends Account {\n\n    CurrentAccount(double balance) {\n        super(balance);\n    }\n\n    @Override\n    double calculateInterest() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double balance = sc.nextDouble();\n\n        Account account;\n\n        if (type.equals(\"Savings\"))\n            account = new SavingsAccount(balance);\n        else\n            account = new CurrentAccount(balance);\n\n        System.out.println(\n                \"Interest: \"\n                + account.calculateInterest());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Account {\n\n    double balance;\n\n    Account(double balance) {\n        this.balance = balance;\n    }\n\n    double calculateInterest() {\n        return 0;\n    }\n}\n\nclass SavingsAccount extends Account {\n\n    SavingsAccount(double balance) {\n        super(balance);\n    }\n\n    @Override\n    double calculateInterest() {\n        return balance * 0.06;\n    }\n}\n\nclass CurrentAccount extends Account {\n\n    CurrentAccount(double balance) {\n        super(balance);\n    }\n\n    @Override\n    double calculateInterest() {\n        return balance * 0.02;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double balance = sc.nextDouble();\n\n        Account account;\n\n        if (type.equals(\"Savings\"))\n            account = new SavingsAccount(balance);\n        else\n            account = new CurrentAccount(balance);\n\n        System.out.println(\n                \"Interest: \"\n                + account.calculateInterest());\n    }\n}",
+    "sampleInput": "Savings\n50000",
+    "sampleOutput": "Interest: 3000.0",
+    "statement": "Create: Account, SavingsAccount, CurrentAccount. Savings account interest = 6%. Current account interest = 2%.",
+    "constraints": "0 <= balance <= 10^9",
+    "explanation": "The method invoked depends on the actual object created, demonstrating runtime polymorphism.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 19,
+    "title": "Abstract Notification Validation",
+    "difficulty": "HARD",
+    "concept": "Abstract class",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nabstract class Notification {\n\n    String message;\n\n    Notification(String message) {\n        this.message = message;\n    }\n\n    abstract boolean validate();\n\n    abstract void send();\n}\n\nclass EmailNotification extends Notification {\n\n    EmailNotification(String message) {\n        super(message);\n    }\n\n    boolean validate() {\n        // Write code\n        return false;\n    }\n\n    void send() {\n        // Write code\n    }\n}\n\nclass SMSNotification extends Notification {\n\n    SMSNotification(String message) {\n        super(message);\n    }\n\n    boolean validate() {\n        // Write code\n        return false;\n    }\n\n    void send() {\n        // Write code\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        String message = sc.next();\n\n        Notification notification;\n\n        if (type.equals(\"Email\"))\n            notification =\n                    new EmailNotification(message);\n        else\n            notification =\n                    new SMSNotification(message);\n\n        if (notification.validate())\n            notification.send();\n        else\n            System.out.println(\n                    \"Invalid Notification\");\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nabstract class Notification {\n\n    String message;\n\n    Notification(String message) {\n        this.message = message;\n    }\n\n    abstract boolean validate();\n\n    abstract void send();\n}\n\nclass EmailNotification extends Notification {\n\n    EmailNotification(String message) {\n        super(message);\n    }\n\n    boolean validate() {\n        return message.contains(\"@\");\n    }\n\n    void send() {\n        System.out.println(\"Email Sent\");\n    }\n}\n\nclass SMSNotification extends Notification {\n\n    SMSNotification(String message) {\n        super(message);\n    }\n\n    boolean validate() {\n        return message.length() == 10;\n    }\n\n    void send() {\n        System.out.println(\"SMS Sent\");\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        String message = sc.next();\n\n        Notification notification;\n\n        if (type.equals(\"Email\"))\n            notification =\n                    new EmailNotification(message);\n        else\n            notification =\n                    new SMSNotification(message);\n\n        if (notification.validate())\n            notification.send();\n        else\n            System.out.println(\n                    \"Invalid Notification\");\n    }\n}",
+    "sampleInput": "Email\nstudent@gmail.com",
+    "sampleOutput": "Email Sent",
+    "statement": "Create an abstract Notification class with validate() and send(). Email is valid if it contains '@'. SMS is valid if its length is exactly 10.",
+    "constraints": "Message length: 1-100\nSMS contains digits.\nEmail contains at least one '@'.",
+    "explanation": "The base class defines the general notification behavior. Each subclass provides its own validation rule.",
+    "timeComplexity": "O(L)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 20,
+    "title": "E-Commerce Product Hierarchy",
+    "difficulty": "HARD",
+    "concept": "Abstract class",
+    "section": {
+      "name": "Section B",
+      "title": "Inheritance, Polymorphism, Abstraction & Interfaces"
+    },
+    "predefinedCode": "import java.util.*;\n\nabstract class Product {\n\n    double price;\n\n    Product(double price) {\n        this.price = price;\n    }\n\n    abstract double finalPrice();\n}\n\nclass Electronics extends Product {\n\n    Electronics(double price) {\n        super(price);\n    }\n\n    double finalPrice() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Clothing extends Product {\n\n    Clothing(double price) {\n        super(price);\n    }\n\n    double finalPrice() {\n        // Write code\n        return 0;\n    }\n}\n\nclass Grocery extends Product {\n\n    Grocery(double price) {\n        super(price);\n    }\n\n    double finalPrice() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double price = sc.nextDouble();\n\n        Product product;\n\n        if (type.equals(\"Electronics\"))\n            product = new Electronics(price);\n\n        else if (type.equals(\"Clothing\"))\n            product = new Clothing(price);\n\n        else\n            product = new Grocery(price);\n\n        System.out.println(\n                \"Final Price: \"\n                + product.finalPrice());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nabstract class Product {\n\n    double price;\n\n    Product(double price) {\n        this.price = price;\n    }\n\n    abstract double finalPrice();\n}\n\nclass Electronics extends Product {\n\n    Electronics(double price) {\n        super(price);\n    }\n\n    double finalPrice() {\n        return price * 1.18;\n    }\n}\n\nclass Clothing extends Product {\n\n    Clothing(double price) {\n        super(price);\n    }\n\n    double finalPrice() {\n        return price * 0.90;\n    }\n}\n\nclass Grocery extends Product {\n\n    Grocery(double price) {\n        super(price);\n    }\n\n    double finalPrice() {\n        return price * 1.05;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String type = sc.next();\n        double price = sc.nextDouble();\n\n        Product product;\n\n        if (type.equals(\"Electronics\"))\n            product = new Electronics(price);\n\n        else if (type.equals(\"Clothing\"))\n            product = new Clothing(price);\n\n        else\n            product = new Grocery(price);\n\n        System.out.println(\n                \"Final Price: \"\n                + product.finalPrice());\n    }\n}",
+    "sampleInput": "Clothing\n2000",
+    "sampleOutput": "Final Price: 1800.0",
+    "statement": "Create an abstract Product class. Electronics -> 18% tax. Clothing -> 10% discount. Grocery -> 5% tax. Calculate the final price.",
+    "constraints": "0 <= price <= 10^9",
+    "explanation": "Each subclass applies its own pricing rule through method overriding.",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 21,
+    "title": "First Non-Repeating Character",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Character frequency counting",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static char firstNonRepeating(String s) {\n        // Write code\n        return '-';\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(\n                firstNonRepeating(s));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static char firstNonRepeating(String s) {\n\n        int[] freq = new int[26];\n\n        for (char c : s.toCharArray())\n            freq[c - 'a']++;\n\n        for (char c : s.toCharArray()) {\n\n            if (freq[c - 'a'] == 1)\n                return c;\n        }\n\n        return '-';\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(\n                firstNonRepeating(s));\n    }\n}",
+    "sampleInput": "swiss",
+    "sampleOutput": "w",
+    "statement": "Find the first character that occurs exactly once.",
+    "constraints": "1 <= length <= 100000\nString contains lowercase English letters.",
+    "explanation": "Frequencies: s -> 3, w -> 1, i -> 1. The first character having frequency 1 is w.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 22,
+    "title": "Remove Duplicate Characters",
+    "difficulty": "MEDIUM",
+    "concept": "String / StringBuilder",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static String removeDuplicates(String s) {\n        // Write code\n        return \"\";\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(\n                removeDuplicates(s));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static String removeDuplicates(String s) {\n\n        boolean[] seen = new boolean[26];\n\n        StringBuilder result =\n                new StringBuilder();\n\n        for (char c : s.toCharArray()) {\n\n            if (!seen[c - 'a']) {\n\n                result.append(c);\n\n                seen[c - 'a'] = true;\n            }\n        }\n\n        return result.toString();\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(\n                removeDuplicates(s));\n    }\n}",
+    "sampleInput": "programming",
+    "sampleOutput": "progamin",
+    "statement": "Remove duplicate characters while preserving their first occurrence.",
+    "constraints": "1 <= length <= 100000\nLowercase English letters.",
+    "explanation": "Characters are added to the result only the first time they are encountered.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 23,
+    "title": "Longest Word in a Sentence",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "String splitting",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static String longestWord(String sentence) {\n        // Write code\n        return \"\";\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String sentence = sc.nextLine();\n\n        System.out.println(\n                longestWord(sentence));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static String longestWord(String sentence) {\n\n        String[] words =\n                sentence.trim().split(\"\\\\s+\");\n\n        String longest = \"\";\n\n        for (String word : words) {\n\n            if (word.length()\n                    > longest.length()) {\n\n                longest = word;\n            }\n        }\n\n        return longest;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String sentence = sc.nextLine();\n\n        System.out.println(\n                longestWord(sentence));\n    }\n}",
+    "sampleInput": "Java programming language",
+    "sampleOutput": "programming",
+    "statement": "Find the longest word in a sentence. If two words have the same length, return the first one.",
+    "constraints": "1 <= sentence.length() <= 100000\nWords are separated by spaces.",
+    "explanation": "The word lengths are: Java -> 4, programming -> 11, language -> 7. Therefore programming is longest.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N) due to splitting"
+  },
+  {
+    "id": 24,
+    "title": "String Compression",
+    "difficulty": "HARD",
+    "concept": "StringBuilder",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static String compress(String s) {\n        // Write code\n        return \"\";\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(compress(s));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static String compress(String s) {\n\n        StringBuilder result =\n                new StringBuilder();\n\n        int count = 1;\n\n        for (int i = 1; i <= s.length(); i++) {\n\n            if (i < s.length()\n                    && s.charAt(i)\n                    == s.charAt(i - 1)) {\n\n                count++;\n\n            } else {\n\n                result.append(\n                        s.charAt(i - 1));\n\n                result.append(count);\n\n                count = 1;\n            }\n        }\n\n        return result.toString();\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(compress(s));\n    }\n}",
+    "sampleInput": "aaabbccccd",
+    "sampleOutput": "a3b2c4d1",
+    "statement": "Compress consecutive characters. Example: aaabbccccd becomes a3b2c4d1.",
+    "constraints": "1 <= length <= 100000\nString contains lowercase English letters.",
+    "explanation": "Count consecutive occurrences of each character and append both the character and its count using StringBuilder.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 25,
+    "title": "Anagram Without Sorting",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Frequency array comparison",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean isAnagram(\n            String a, String b) {\n        // Write code\n        return false;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String a = sc.next();\n        String b = sc.next();\n\n        System.out.println(\n                isAnagram(a, b)\n                ? \"Anagram\"\n                : \"Not Anagram\");\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean isAnagram(\n            String a, String b) {\n\n        if (a.length() != b.length())\n            return false;\n\n        int[] freq = new int[26];\n\n        for (char c : a.toCharArray())\n            freq[c - 'a']++;\n\n        for (char c : b.toCharArray())\n            freq[c - 'a']--;\n\n        for (int value : freq) {\n\n            if (value != 0)\n                return false;\n        }\n\n        return true;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String a = sc.next();\n        String b = sc.next();\n\n        System.out.println(\n                isAnagram(a, b)\n                ? \"Anagram\"\n                : \"Not Anagram\");\n    }\n}",
+    "sampleInput": "listen\nsilent",
+    "sampleOutput": "Anagram",
+    "statement": "Determine whether two strings are anagrams without sorting them.",
+    "constraints": "1 <= length <= 100000\nStrings contain lowercase English letters.",
+    "explanation": "Both strings contain exactly the same frequency of every character.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 26,
+    "title": "Palindrome Ignoring Spaces and Case",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Two-pointer technique",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean isPalindrome(String s) {\n        // Write code\n        return false;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.nextLine();\n\n        System.out.println(\n                isPalindrome(s)\n                ? \"Palindrome\"\n                : \"Not Palindrome\");\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean isPalindrome(String s) {\n\n        StringBuilder clean =\n                new StringBuilder();\n\n        for (char c : s.toCharArray()) {\n\n            if (Character.isLetterOrDigit(c)) {\n\n                clean.append(\n                        Character.toLowerCase(c));\n            }\n        }\n\n        int left = 0;\n        int right = clean.length() - 1;\n\n        while (left < right) {\n\n            if (clean.charAt(left)\n                    != clean.charAt(right)) {\n\n                return false;\n            }\n\n            left++;\n            right--;\n        }\n\n        return true;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.nextLine();\n\n        System.out.println(\n                isPalindrome(s)\n                ? \"Palindrome\"\n                : \"Not Palindrome\");\n    }\n}",
+    "sampleInput": "A man, a plan, a canal: Panama",
+    "sampleOutput": "Palindrome",
+    "statement": "Determine whether a sentence is a palindrome after ignoring spaces, case, and special characters.",
+    "constraints": "1 <= length <= 100000",
+    "explanation": "After removing non-alphanumeric characters and converting to lowercase: amanaplanacanalpanama. It reads the same forward and backward.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 27,
+    "title": "Reverse Words",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "StringBuilder",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static String reverseWords(String s) {\n        // Write code\n        return \"\";\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.nextLine();\n\n        System.out.println(\n                reverseWords(s));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static String reverseWords(String s) {\n\n        String[] words =\n                s.trim().split(\"\\\\s+\");\n\n        StringBuilder result =\n                new StringBuilder();\n\n        for (int i = words.length - 1;\n             i >= 0;\n             i--) {\n\n            result.append(words[i]);\n\n            if (i != 0)\n                result.append(\" \");\n        }\n\n        return result.toString();\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.nextLine();\n\n        System.out.println(\n                reverseWords(s));\n    }\n}",
+    "sampleInput": "Java is powerful",
+    "sampleOutput": "powerful is Java",
+    "statement": "Reverse the order of words without reversing individual characters.",
+    "constraints": "1 <= sentence.length() <= 100000",
+    "explanation": "The words are stored and processed from the last word to the first.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 28,
+    "title": "String Rotation",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "String concatenation trick",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean isRotation(\n            String a, String b) {\n        // Write code\n        return false;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String a = sc.next();\n        String b = sc.next();\n\n        System.out.println(\n                isRotation(a, b)\n                ? \"Rotation\"\n                : \"Not Rotation\");\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean isRotation(\n            String a, String b) {\n\n        if (a.length() != b.length())\n            return false;\n\n        return (a + a).contains(b);\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String a = sc.next();\n        String b = sc.next();\n\n        System.out.println(\n                isRotation(a, b)\n                ? \"Rotation\"\n                : \"Not Rotation\");\n    }\n}",
+    "sampleInput": "ABCD\nCDAB",
+    "sampleOutput": "Rotation",
+    "statement": "Determine whether string B is a rotation of string A.",
+    "constraints": "1 <= length <= 100000\nBoth strings contain lowercase letters.",
+    "explanation": "If B is a rotation of A, then B must be present inside A + A. For example, ABCDABCD contains CDAB.",
+    "timeComplexity": "O(N) average for the practical string-search approach",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 29,
+    "title": "Longest Substring Without Repeating Characters",
+    "difficulty": "HARD",
+    "concept": "Sliding window",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static int longestUniqueSubstring(String s) {\n        // Write code\n        return 0;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(\n                longestUniqueSubstring(s));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static int longestUniqueSubstring(String s) {\n\n        HashSet<Character> set =\n                new HashSet<>();\n\n        int left = 0;\n        int max = 0;\n\n        for (int right = 0;\n             right < s.length();\n             right++) {\n\n            while (set.contains(\n                    s.charAt(right))) {\n\n                set.remove(\n                        s.charAt(left));\n\n                left++;\n            }\n\n            set.add(s.charAt(right));\n\n            max = Math.max(\n                    max,\n                    right - left + 1);\n        }\n\n        return max;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String s = sc.next();\n\n        System.out.println(\n                longestUniqueSubstring(s));\n    }\n}",
+    "sampleInput": "abcabcbb",
+    "sampleOutput": "3",
+    "statement": "Find the length of the longest substring containing no repeated characters.",
+    "constraints": "1 <= length <= 100000\nString contains ASCII characters.",
+    "explanation": "The longest substrings without repetition include abc, which has length 3. A sliding-window approach maintains the current unique substring.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(min(N, character-set-size))"
+  },
+  {
+    "id": 30,
+    "title": "Compare Strings Without equals()",
+    "difficulty": "HARD",
+    "concept": "Manual character comparison",
+    "section": {
+      "name": "Section C",
+      "title": "String, StringBuilder & String Comparisons"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean compareStrings(\n            String a, String b) {\n        // Write code\n        return false;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String a = sc.next();\n        String b = sc.next();\n\n        System.out.println(\n                compareStrings(a, b)\n                ? \"Equal\"\n                : \"Not Equal\");\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static boolean compareStrings(\n            String a, String b) {\n\n        if (a.length() != b.length())\n            return false;\n\n        for (int i = 0;\n             i < a.length();\n             i++) {\n\n            if (a.charAt(i)\n                    != b.charAt(i)) {\n\n                return false;\n            }\n        }\n\n        return true;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        String a = sc.next();\n        String b = sc.next();\n\n        System.out.println(\n                compareStrings(a, b)\n                ? \"Equal\"\n                : \"Not Equal\");\n    }\n}",
+    "sampleInput": "Hello\nHello",
+    "sampleOutput": "Equal",
+    "statement": "Implement your own string comparison method without using equals() or compareTo(). Return true only when both strings are exactly identical.",
+    "constraints": "1 <= length <= 100000",
+    "explanation": "First compare lengths. If they are equal, compare every corresponding character.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 31,
+    "title": "Matrix Multiplication",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "2D array",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static int[][] multiply(\n            int[][] a,\n            int[][] b) {\n        // Write code\n        return null;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r1 = sc.nextInt();\n        int c1 = sc.nextInt();\n\n        int[][] a = new int[r1][c1];\n\n        for (int i = 0; i < r1; i++)\n            for (int j = 0; j < c1; j++)\n                a[i][j] = sc.nextInt();\n\n        int r2 = sc.nextInt();\n        int c2 = sc.nextInt();\n\n        int[][] b = new int[r2][c2];\n\n        for (int i = 0; i < r2; i++)\n            for (int j = 0; j < c2; j++)\n                b[i][j] = sc.nextInt();\n\n        if (c1 != r2) {\n\n            System.out.println(\n                    \"Multiplication Not Possible\");\n\n            return;\n        }\n\n        int[][] result = multiply(a, b);\n\n        for (int[] row : result) {\n\n            for (int value : row)\n                System.out.print(value + \" \");\n\n            System.out.println();\n        }\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static int[][] multiply(\n            int[][] a,\n            int[][] b) {\n\n        int rows = a.length;\n        int common = a[0].length;\n        int cols = b[0].length;\n\n        int[][] result =\n                new int[rows][cols];\n\n        for (int i = 0; i < rows; i++) {\n\n            for (int j = 0; j < cols; j++) {\n\n                for (int k = 0; k < common; k++) {\n\n                    result[i][j] +=\n                            a[i][k] * b[k][j];\n                }\n            }\n        }\n\n        return result;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r1 = sc.nextInt();\n        int c1 = sc.nextInt();\n\n        int[][] a = new int[r1][c1];\n\n        for (int i = 0; i < r1; i++)\n            for (int j = 0; j < c1; j++)\n                a[i][j] = sc.nextInt();\n\n        int r2 = sc.nextInt();\n        int c2 = sc.nextInt();\n\n        int[][] b = new int[r2][c2];\n\n        for (int i = 0; i < r2; i++)\n            for (int j = 0; j < c2; j++)\n                b[i][j] = sc.nextInt();\n\n        if (c1 != r2) {\n\n            System.out.println(\n                    \"Multiplication Not Possible\");\n\n            return;\n        }\n\n        int[][] result =\n                multiply(a, b);\n\n        for (int[] row : result) {\n\n            for (int value : row)\n                System.out.print(value + \" \");\n\n            System.out.println();\n        }\n    }\n}",
+    "sampleInput": "2 2\n1 2\n3 4\n2 2\n5 6\n7 8",
+    "sampleOutput": "19 22\n43 50",
+    "statement": "Multiply two matrices. Matrix multiplication is possible only if columns of A = rows of B.",
+    "constraints": "1 <= rows, columns <= 100\nMatrix values: -10^4 to 10^4",
+    "explanation": "Each result cell is calculated as result[i][j] = sum of a[i][k] x b[k][j].",
+    "timeComplexity": "O(r1 x c1 x c2)",
+    "spaceComplexity": "O(r1 x c2)"
+  },
+  {
+    "id": 32,
+    "title": "Spiral Matrix Traversal",
+    "difficulty": "HARD",
+    "concept": "2D array boundary traversal",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static void spiral(int[][] matrix) {\n        // Write code\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r = sc.nextInt();\n        int c = sc.nextInt();\n\n        int[][] matrix = new int[r][c];\n\n        for (int i = 0; i < r; i++)\n            for (int j = 0; j < c; j++)\n                matrix[i][j] = sc.nextInt();\n\n        spiral(matrix);\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static void spiral(int[][] matrix) {\n\n        int top = 0;\n        int bottom = matrix.length - 1;\n\n        int left = 0;\n        int right = matrix[0].length - 1;\n\n        while (top <= bottom\n                && left <= right) {\n\n            for (int j = left; j <= right; j++)\n                System.out.print(\n                        matrix[top][j] + \" \");\n\n            top++;\n\n            for (int i = top; i <= bottom; i++)\n                System.out.print(\n                        matrix[i][right] + \" \");\n\n            right--;\n\n            if (top <= bottom) {\n\n                for (int j = right;\n                     j >= left;\n                     j--) {\n\n                    System.out.print(\n                            matrix[bottom][j] + \" \");\n                }\n\n                bottom--;\n            }\n\n            if (left <= right) {\n\n                for (int i = bottom;\n                     i >= top;\n                     i--) {\n\n                    System.out.print(\n                            matrix[i][left] + \" \");\n                }\n\n                left++;\n            }\n        }\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r = sc.nextInt();\n        int c = sc.nextInt();\n\n        int[][] matrix = new int[r][c];\n\n        for (int i = 0; i < r; i++)\n            for (int j = 0; j < c; j++)\n                matrix[i][j] = sc.nextInt();\n\n        spiral(matrix);\n    }\n}",
+    "sampleInput": "3 3\n1 2 3\n4 5 6\n7 8 9",
+    "sampleOutput": "1 2 3 6 9 8 7 4 5",
+    "statement": "Print the elements of a matrix in spiral order.",
+    "constraints": "1 <= rows, columns <= 100\nValues are integers.",
+    "explanation": "Maintain four boundaries: top, bottom, left, right. Process one outer layer at a time.",
+    "timeComplexity": "O(R x C)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 33,
+    "title": "Rotate Matrix 90 Degrees",
+    "difficulty": "HARD",
+    "concept": "In-place 2D array manipulation",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static void rotate(int[][] matrix) {\n        // Write code\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[][] matrix = new int[n][n];\n\n        for (int i = 0; i < n; i++)\n            for (int j = 0; j < n; j++)\n                matrix[i][j] = sc.nextInt();\n\n        rotate(matrix);\n\n        for (int[] row : matrix) {\n\n            for (int value : row)\n                System.out.print(value + \" \");\n\n            System.out.println();\n        }\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static void rotate(int[][] matrix) {\n\n        int n = matrix.length;\n\n        // Transpose\n        for (int i = 0; i < n; i++) {\n\n            for (int j = i + 1;\n                 j < n;\n                 j++) {\n\n                int temp = matrix[i][j];\n\n                matrix[i][j] =\n                        matrix[j][i];\n\n                matrix[j][i] = temp;\n            }\n        }\n\n        // Reverse every row\n        for (int i = 0; i < n; i++) {\n\n            int left = 0;\n            int right = n - 1;\n\n            while (left < right) {\n\n                int temp =\n                        matrix[i][left];\n\n                matrix[i][left] =\n                        matrix[i][right];\n\n                matrix[i][right] = temp;\n\n                left++;\n                right--;\n            }\n        }\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[][] matrix = new int[n][n];\n\n        for (int i = 0; i < n; i++)\n            for (int j = 0; j < n; j++)\n                matrix[i][j] = sc.nextInt();\n\n        rotate(matrix);\n\n        for (int[] row : matrix) {\n\n            for (int value : row)\n                System.out.print(value + \" \");\n\n            System.out.println();\n        }\n    }\n}",
+    "sampleInput": "3\n1 2 3\n4 5 6\n7 8 9",
+    "sampleOutput": "7 4 1\n8 5 2\n9 6 3",
+    "statement": "Rotate a square matrix by 90 degrees clockwise in-place.",
+    "constraints": "1 <= N <= 100\nMatrix is square.",
+    "explanation": "A clockwise rotation can be achieved using two operations: (1) Transpose the matrix, (2) Reverse every row.",
+    "timeComplexity": "O(N^2)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 34,
+    "title": "Row With Maximum Sum",
+    "difficulty": "MEDIUM",
+    "concept": "2D array traversal",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static int[] maximumRowSum(\n            int[][] matrix) {\n        // Write code\n        return null;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r = sc.nextInt();\n        int c = sc.nextInt();\n\n        int[][] matrix = new int[r][c];\n\n        for (int i = 0; i < r; i++)\n            for (int j = 0; j < c; j++)\n                matrix[i][j] = sc.nextInt();\n\n        int[] result =\n                maximumRowSum(matrix);\n\n        System.out.println(\n                \"Row: \" + result[0]);\n\n        System.out.println(\n                \"Sum: \" + result[1]);\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static int[] maximumRowSum(\n            int[][] matrix) {\n\n        int maxSum =\n                Integer.MIN_VALUE;\n\n        int rowNumber = 0;\n\n        for (int i = 0;\n             i < matrix.length;\n             i++) {\n\n            int sum = 0;\n\n            for (int value : matrix[i])\n                sum += value;\n\n            if (sum > maxSum) {\n\n                maxSum = sum;\n                rowNumber = i + 1;\n            }\n        }\n\n        return new int[]{\n                rowNumber, maxSum\n        };\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r = sc.nextInt();\n        int c = sc.nextInt();\n\n        int[][] matrix = new int[r][c];\n\n        for (int i = 0; i < r; i++)\n            for (int j = 0; j < c; j++)\n                matrix[i][j] = sc.nextInt();\n\n        int[] result =\n                maximumRowSum(matrix);\n\n        System.out.println(\n                \"Row: \" + result[0]);\n\n        System.out.println(\n                \"Sum: \" + result[1]);\n    }\n}",
+    "sampleInput": "3 3\n1 2 3\n9 1 1\n2 2 2",
+    "sampleOutput": "Row: 2\nSum: 11",
+    "statement": "Find the row having the maximum sum. Return the row number using 1-based indexing.",
+    "constraints": "1 <= rows, columns <= 1000\nMatrix values: -10^6 to 10^6",
+    "explanation": "Row sums: Row 1 -> 6, Row 2 -> 11, Row 3 -> 6. Therefore row 2 is selected.",
+    "timeComplexity": "O(R x C)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 35,
+    "title": "Saddle Point in Matrix",
+    "difficulty": "HARD",
+    "concept": "2D array traversal",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static int findSaddlePoint(\n            int[][] matrix) {\n        // Write code\n        return -1;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r = sc.nextInt();\n        int c = sc.nextInt();\n\n        int[][] matrix = new int[r][c];\n\n        for (int i = 0; i < r; i++)\n            for (int j = 0; j < c; j++)\n                matrix[i][j] = sc.nextInt();\n\n        int result =\n                findSaddlePoint(matrix);\n\n        if (result == -1)\n            System.out.println(\n                    \"No Saddle Point\");\n        else\n            System.out.println(\n                    \"Saddle Point: \" + result);\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static int findSaddlePoint(\n            int[][] matrix) {\n\n        int rows = matrix.length;\n        int cols = matrix[0].length;\n\n        for (int i = 0; i < rows; i++) {\n\n            int minCol = 0;\n\n            // Find minimum in current row\n            for (int j = 1; j < cols; j++) {\n\n                if (matrix[i][j]\n                        < matrix[i][minCol]) {\n\n                    minCol = j;\n                }\n            }\n\n            boolean isMaximum = true;\n\n            // Check whether it is maximum\n            // in its column\n            for (int k = 0; k < rows; k++) {\n\n                if (matrix[k][minCol]\n                        > matrix[i][minCol]) {\n\n                    isMaximum = false;\n                    break;\n                }\n            }\n\n            if (isMaximum)\n                return matrix[i][minCol];\n        }\n\n        return -1;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int r = sc.nextInt();\n        int c = sc.nextInt();\n\n        int[][] matrix = new int[r][c];\n\n        for (int i = 0; i < r; i++)\n            for (int j = 0; j < c; j++)\n                matrix[i][j] = sc.nextInt();\n\n        int result =\n                findSaddlePoint(matrix);\n\n        if (result == -1)\n            System.out.println(\n                    \"No Saddle Point\");\n        else\n            System.out.println(\n                    \"Saddle Point: \" + result);\n    }\n}",
+    "sampleInput": "3 3\n3 4 5\n2 1 6\n1 0 7",
+    "sampleOutput": "Saddle Point: 3",
+    "statement": "Find an element that is minimum in its row and maximum in its column. Such an element is called a saddle point.",
+    "constraints": "1 <= R,C <= 100\nMatrix values: -10^9 to 10^9",
+    "explanation": "Note: the naive 1-9 ascending matrix example is a common ambiguity trap for this definition -- its row-minimums are not column-maximums, so it yields no saddle point. The corrected sample below is consistent with the stated definition. Here 3 is the minimum in its row (3, 4, 5) and, checking its column (3, 2, 1), it is also the maximum in that column.",
+    "timeComplexity": "O(R x C)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 36,
+    "title": "Diagonal Difference",
+    "difficulty": "MEDIUM",
+    "concept": "2D array diagonals",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\npublic class Main {\n\n    static int diagonalDifference(\n            int[][] matrix) {\n        // Write code\n        return 0;\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[][] matrix = new int[n][n];\n\n        for (int i = 0; i < n; i++)\n            for (int j = 0; j < n; j++)\n                matrix[i][j] = sc.nextInt();\n\n        System.out.println(\n                diagonalDifference(matrix));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\npublic class Main {\n\n    static int diagonalDifference(\n            int[][] matrix) {\n\n        int n = matrix.length;\n\n        int primary = 0;\n        int secondary = 0;\n\n        for (int i = 0; i < n; i++) {\n\n            primary += matrix[i][i];\n\n            secondary +=\n                    matrix[i][n - i - 1];\n        }\n\n        return Math.abs(\n                primary - secondary);\n    }\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[][] matrix = new int[n][n];\n\n        for (int i = 0; i < n; i++)\n            for (int j = 0; j < n; j++)\n                matrix[i][j] = sc.nextInt();\n\n        System.out.println(\n                diagonalDifference(matrix));\n    }\n}",
+    "sampleInput": "3\n1 2 3\n4 5 6\n7 8 9",
+    "sampleOutput": "0",
+    "statement": "Calculate the absolute difference between the primary and secondary diagonal sums of a square matrix.",
+    "constraints": "1 <= N <= 1000\nMatrix values: -10^6 to 10^6",
+    "explanation": "Primary diagonal: 1 + 5 + 9 = 15. Secondary diagonal: 3 + 5 + 7 = 15. Difference: |15 - 15| = 0.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 37,
+    "title": "Encapsulated Bank Account",
+    "difficulty": "HARD",
+    "concept": "Access modifiers, encapsulation",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass BankAccount {\n\n    private double balance;\n\n    BankAccount(double balance) {\n        // Write code\n    }\n\n    public void deposit(double amount) {\n        // Write code\n    }\n\n    public void withdraw(double amount) {\n        // Write code\n    }\n\n    public double getBalance() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        double balance = sc.nextDouble();\n\n        BankAccount account =\n                new BankAccount(balance);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++) {\n\n            String operation = sc.next();\n            double amount = sc.nextDouble();\n\n            if (operation.equals(\"deposit\"))\n                account.deposit(amount);\n            else\n                account.withdraw(amount);\n        }\n\n        System.out.println(\n                \"Balance: \"\n                + account.getBalance());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass BankAccount {\n\n    private double balance;\n\n    BankAccount(double balance) {\n\n        this.balance = balance;\n    }\n\n    public void deposit(double amount) {\n\n        balance += amount;\n    }\n\n    public void withdraw(double amount) {\n\n        if (amount <= balance) {\n\n            balance -= amount;\n\n        } else {\n\n            System.out.println(\n                    \"Insufficient Balance\");\n        }\n    }\n\n    public double getBalance() {\n\n        return balance;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        double balance = sc.nextDouble();\n\n        BankAccount account =\n                new BankAccount(balance);\n\n        int n = sc.nextInt();\n\n        for (int i = 0; i < n; i++) {\n\n            String operation = sc.next();\n            double amount = sc.nextDouble();\n\n            if (operation.equals(\"deposit\"))\n                account.deposit(amount);\n\n            else\n                account.withdraw(amount);\n        }\n\n        System.out.println(\n                \"Balance: \"\n                + account.getBalance());\n    }\n}",
+    "sampleInput": "10000\n3\nwithdraw 3000\ndeposit 5000\nwithdraw 15000",
+    "sampleOutput": "Insufficient Balance\nBalance: 12000.0",
+    "statement": "Create a BankAccount class where balance is private. Implement deposit(), withdraw(), getBalance(). Withdrawal should fail when the amount is greater than the available balance.",
+    "constraints": "0 <= initialBalance <= 10^9\n0 <= amount <= 10^9\nNumber of transactions: 1-10000",
+    "explanation": "balance cannot be directly modified outside the class because it is private. The class controls access through public methods.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 38,
+    "title": "Utility Class for Array Operations",
+    "difficulty": "MEDIUM-HARD",
+    "concept": "Packages / static utility methods",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass NumberUtility {\n\n    public static int maximum(int[] arr) {\n        // Write code\n        return 0;\n    }\n\n    public static int minimum(int[] arr) {\n        // Write code\n        return 0;\n    }\n\n    public static double average(int[] arr) {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[] arr = new int[n];\n\n        for (int i = 0; i < n; i++)\n            arr[i] = sc.nextInt();\n\n        System.out.println(\n                \"Maximum: \"\n                + NumberUtility.maximum(arr));\n\n        System.out.println(\n                \"Minimum: \"\n                + NumberUtility.minimum(arr));\n\n        System.out.println(\n                \"Average: \"\n                + NumberUtility.average(arr));\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass NumberUtility {\n\n    public static int maximum(int[] arr) {\n\n        int max = arr[0];\n\n        for (int value : arr)\n            max = Math.max(max, value);\n\n        return max;\n    }\n\n    public static int minimum(int[] arr) {\n\n        int min = arr[0];\n\n        for (int value : arr)\n            min = Math.min(min, value);\n\n        return min;\n    }\n\n    public static double average(int[] arr) {\n\n        long sum = 0;\n\n        for (int value : arr)\n            sum += value;\n\n        return (double) sum / arr.length;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[] arr = new int[n];\n\n        for (int i = 0; i < n; i++)\n            arr[i] = sc.nextInt();\n\n        System.out.println(\n                \"Maximum: \"\n                + NumberUtility.maximum(arr));\n\n        System.out.println(\n                \"Minimum: \"\n                + NumberUtility.minimum(arr));\n\n        System.out.println(\n                \"Average: \"\n                + NumberUtility.average(arr));\n    }\n}",
+    "sampleInput": "5\n10 20 30 40 50",
+    "sampleOutput": "Maximum: 50\nMinimum: 10\nAverage: 30.0",
+    "statement": "Create a utility class similar to one that could be placed inside a package such as utilities. Implement static methods: maximum(), minimum(), average().",
+    "constraints": "1 <= N <= 100000\n-10^9 <= arr[i] <= 10^9",
+    "explanation": "A utility class contains reusable static methods, so an object does not need to be created.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(1)"
+  },
+  {
+    "id": 39,
+    "title": "Encapsulated Student Result",
+    "difficulty": "HARD",
+    "concept": "Access modifiers, encapsulation",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass Student {\n\n    private int[] marks;\n\n    public void setMarks(int[] marks) {\n        // Write code\n    }\n\n    public int[] getMarks() {\n        // Write code\n        return null;\n    }\n\n    public double calculateAverage() {\n        // Write code\n        return 0;\n    }\n\n    public char calculateGrade() {\n        // Write code\n        return 'F';\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[] marks = new int[n];\n\n        for (int i = 0; i < n; i++)\n            marks[i] = sc.nextInt();\n\n        Student student = new Student();\n\n        student.setMarks(marks);\n\n        System.out.println(\n                \"Average: \"\n                + student.calculateAverage());\n\n        System.out.println(\n                \"Grade: \"\n                + student.calculateGrade());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass Student {\n\n    private int[] marks;\n\n    public void setMarks(int[] marks) {\n\n        this.marks = marks;\n    }\n\n    public int[] getMarks() {\n\n        return marks;\n    }\n\n    public double calculateAverage() {\n\n        int sum = 0;\n\n        for (int mark : marks)\n            sum += mark;\n\n        return (double) sum / marks.length;\n    }\n\n    public char calculateGrade() {\n\n        double average =\n                calculateAverage();\n\n        if (average >= 90)\n            return 'A';\n\n        if (average >= 75)\n            return 'B';\n\n        if (average >= 60)\n            return 'C';\n\n        if (average >= 50)\n            return 'D';\n\n        return 'F';\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int n = sc.nextInt();\n\n        int[] marks = new int[n];\n\n        for (int i = 0; i < n; i++)\n            marks[i] = sc.nextInt();\n\n        Student student = new Student();\n\n        student.setMarks(marks);\n\n        System.out.println(\n                \"Average: \"\n                + student.calculateAverage());\n\n        System.out.println(\n                \"Grade: \"\n                + student.calculateGrade());\n    }\n}",
+    "sampleInput": "3\n80 90 70",
+    "sampleOutput": "Average: 80.0\nGrade: B",
+    "statement": "Create a Student class where marks are private. Implement setMarks(), getMarks(), calculateAverage(), calculateGrade(). Grade rules: >=90 A, >=75 B, >=60 C, >=50 D, otherwise F.",
+    "constraints": "1 <= N <= 100\n0 <= marks <= 100",
+    "explanation": "The marks array is private, so outside code cannot directly modify it. The public methods provide controlled access. Average = (80+90+70)/3 = 80, so grade is B.",
+    "timeComplexity": "O(N)",
+    "spaceComplexity": "O(N)"
+  },
+  {
+    "id": 40,
+    "title": "Matrix Analyzer Using Encapsulation",
+    "difficulty": "HARD",
+    "concept": "Encapsulation + 2D array",
+    "section": {
+      "name": "Section D",
+      "title": "Multidimensional Arrays, Packages & Access Modifiers"
+    },
+    "predefinedCode": "import java.util.*;\n\nclass MatrixAnalyzer {\n\n    private int[][] matrix;\n\n    MatrixAnalyzer(int[][] matrix) {\n        // Write code\n    }\n\n    public int maximum() {\n        // Write code\n        return 0;\n    }\n\n    public int minimum() {\n        // Write code\n        return 0;\n    }\n\n    public int maximumRow() {\n        // Write code\n        return 0;\n    }\n\n    public int maximumColumn() {\n        // Write code\n        return 0;\n    }\n\n    public long diagonalSum() {\n        // Write code\n        return 0;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int rows = sc.nextInt();\n        int cols = sc.nextInt();\n\n        int[][] matrix =\n                new int[rows][cols];\n\n        for (int i = 0; i < rows; i++) {\n\n            for (int j = 0; j < cols; j++) {\n\n                matrix[i][j] = sc.nextInt();\n            }\n        }\n\n        MatrixAnalyzer analyzer =\n                new MatrixAnalyzer(matrix);\n\n        System.out.println(\n                \"Maximum: \"\n                + analyzer.maximum());\n\n        System.out.println(\n                \"Minimum: \"\n                + analyzer.minimum());\n\n        System.out.println(\n                \"Maximum Row: \"\n                + analyzer.maximumRow());\n\n        System.out.println(\n                \"Maximum Column: \"\n                + analyzer.maximumColumn());\n\n        System.out.println(\n                \"Diagonal Sum: \"\n                + analyzer.diagonalSum());\n    }\n}",
+    "solutionCode": "import java.util.*;\n\nclass MatrixAnalyzer {\n\n    private int[][] matrix;\n\n    MatrixAnalyzer(int[][] matrix) {\n\n        this.matrix = matrix;\n    }\n\n    public int maximum() {\n\n        int max = Integer.MIN_VALUE;\n\n        for (int[] row : matrix) {\n\n            for (int value : row) {\n\n                if (value > max)\n                    max = value;\n            }\n        }\n\n        return max;\n    }\n\n    public int minimum() {\n\n        int min = Integer.MAX_VALUE;\n\n        for (int[] row : matrix) {\n\n            for (int value : row) {\n\n                if (value < min)\n                    min = value;\n            }\n        }\n\n        return min;\n    }\n\n    public int maximumRow() {\n\n        long maxSum =\n                Long.MIN_VALUE;\n\n        int result = 0;\n\n        for (int i = 0;\n             i < matrix.length;\n             i++) {\n\n            long sum = 0;\n\n            for (int value : matrix[i])\n                sum += value;\n\n            if (sum > maxSum) {\n\n                maxSum = sum;\n                result = i + 1;\n            }\n        }\n\n        return result;\n    }\n\n    public int maximumColumn() {\n\n        int rows = matrix.length;\n        int cols = matrix[0].length;\n\n        long maxSum =\n                Long.MIN_VALUE;\n\n        int result = 0;\n\n        for (int j = 0; j < cols; j++) {\n\n            long sum = 0;\n\n            for (int i = 0; i < rows; i++)\n                sum += matrix[i][j];\n\n            if (sum > maxSum) {\n\n                maxSum = sum;\n                result = j + 1;\n            }\n        }\n\n        return result;\n    }\n\n    public long diagonalSum() {\n\n        long sum = 0;\n\n        int limit = Math.min(\n                matrix.length,\n                matrix[0].length);\n\n        for (int i = 0; i < limit; i++)\n            sum += matrix[i][i];\n\n        return sum;\n    }\n}\n\npublic class Main {\n\n    public static void main(String[] args) {\n\n        Scanner sc = new Scanner(System.in);\n\n        int rows = sc.nextInt();\n        int cols = sc.nextInt();\n\n        int[][] matrix =\n                new int[rows][cols];\n\n        for (int i = 0; i < rows; i++) {\n\n            for (int j = 0; j < cols; j++) {\n\n                matrix[i][j] = sc.nextInt();\n            }\n        }\n\n        MatrixAnalyzer analyzer =\n                new MatrixAnalyzer(matrix);\n\n        System.out.println(\n                \"Maximum: \"\n                + analyzer.maximum());\n\n        System.out.println(\n                \"Minimum: \"\n                + analyzer.minimum());\n\n        System.out.println(\n                \"Maximum Row: \"\n                + analyzer.maximumRow());\n\n        System.out.println(\n                \"Maximum Column: \"\n                + analyzer.maximumColumn());\n\n        System.out.println(\n                \"Diagonal Sum: \"\n                + analyzer.diagonalSum());\n    }\n}",
+    "sampleInput": "3 3\n1 5 3\n8 2 6\n4 7 9",
+    "sampleOutput": "Maximum: 9\nMinimum: 1\nMaximum Row: 3\nMaximum Column: 3\nDiagonal Sum: 12",
+    "statement": "Create a MatrixAnalyzer class where the matrix is private. Implement public methods to find: maximum element, minimum element, row with maximum sum, column with maximum sum, main diagonal sum.",
+    "constraints": "1 <= R,C <= 500\nMatrix values: -10^6 to 10^6\nMatrix can be rectangular.\nDiagonal sum is calculated for min(R,C) elements.",
+    "explanation": "Row sums: Row1=9, Row2=16, Row3=20, so max row = 3. Column sums: Col1=13, Col2=14, Col3=18, so max column = 3. Main diagonal: 1 + 2 + 9 = 12.",
+    "timeComplexity": "O(R x C)",
+    "spaceComplexity": "O(1) auxiliary space"
+  }
+]
