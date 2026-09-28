@@ -1,88 +1,36 @@
-# CodePad
+# ⚡ ForgeJudge (formerly CodePad)
 
-A local Java practice platform for the **40-question OOPS set** — question on the left,
-live Java editor on the right, with **Run** and **Submit** judging against official sample tests.
+A high-performance, zero-dependency **Local Algorithmic & OOPS Test Execution Engine** featuring **93 verified problems** (**53 CSES Problem Set** classics + **40 Java OOPS** problems) with multi-language local compilation and multi-testcase judging.
 
-![stack](https://img.shields.io/badge/stack-node.js%20%2B%20vanilla%20js-blue) ![deps](https://img.shields.io/badge/dependencies-zero-brightgreen)
+![stack](https://img.shields.io/badge/stack-node.js%20%2B%20local%20compilers-38bdf8) ![problems](https://img.shields.io/badge/problems-93%20verified%20(53%20CSES%20%2B%2040%20OOPS)-10b981) ![languages](https://img.shields.io/badge/languages-Java%20%7C%20C%2B%2B17%20%7C%20Python%203%20%7C%20Node.js-818cf8)
 
-## Features
+## ✨ Key Upgrades in ForgeJudge v2.0
 
-- **Question bank UI** — all 40 problems grouped into 4 sections (statics, OOP, strings, 2D arrays) with difficulty badges, search, and solved-checkmarks
-- **Java editor** — syntax highlighting, line numbers, auto-indent, Tab/Shift+Tab, `Ctrl+Enter` to run
-- **Predefined templates** — every question opens pre-filled with its official `Main.java` stub
-- **Run** — compiles (`javac`) and executes your code with custom stdin
-- **Submit** — judges against the sample tests with expected-vs-actual diff view; accepted submissions update progress
-- **Progress tracking** — solved state + per-question saved code persist in `localStorage`
-- **Solution reveal** — complete solution + time/space complexity behind a spoiler
+- **93 Verified Problems (222 Testcases)**:
+  - **CSES Problem Set Track (53 Problems)** across 5 major sections:
+    - *CSES · Introductory Problems* (Weird Algorithm, Missing Number, Repetitions, Increasing Array, Permutations, Number Spiral, Two Knights, Two Sets, Bit Strings, Trailing Zeros, Coin Piles, Palindrome Reorder, Gray Code, Tower of Hanoi, Apple Division)
+    - *CSES · Sorting & Searching* (Distinct Numbers, Apartments, Ferris Wheel, Restaurant Customers, Movie Festival, Sum of Two Values, Maximum Subarray Sum, Stick Lengths, Missing Coin Sum, Collecting Numbers, Towers, Subarray Sums I)
+    - *CSES · Dynamic Programming* (Dice Combinations, Minimizing Coins, Coin Combinations I & II, Removing Digits, Grid Paths, Book Shop, Edit Distance, Increasing Subsequence, Money Sums)
+    - *CSES · Graph Algorithms & Trees* (Counting Rooms, Labyrinth, Building Roads, Message Route, Shortest Routes I & II, Subordinates, Tree Diameter)
+    - *CSES · Range Queries, Math & Strings* (Static Range Sum/Min Queries, Dynamic Range Sum Queries, Range Xor Queries, Exponentiation, Counting Divisors, Common Divisors, String Matching)
+  - **Java OOPS 40 Track (40 Problems)** across 4 sections (*Static Members*, *OOP & Inheritance*, *Strings*, *2D Arrays*), now enriched with multi-testcase verification suites.
+- **Multi-Language Local Execution Engine (`server/services/local-runner.js`)**:
+  - Automatic startup detection for **Java (`javac` / `java`)**, **C++17 (`g++ -O2`)**, **Python 3 (`python`)**, and **Node.js (`node`)**.
+  - **Single-Compile Batch Judging**: Compiles source code once per submission and executes the compiled binary across all sample and hidden testcases.
+  - **Accurate Verdict Classification**: Distinguishes `ACCEPTED`, `WRONG_ANSWER`, `TIME_LIMIT_EXCEEDED` (TLE), `RUNTIME_ERROR` (RTE), and `COMPILE_ERROR` (CE).
+- **ForgeJudge Cyber-Obsidian IDE**:
+  - Track switcher (`All`, `CSES`, `OOPS`), difficulty & unsolved filter pills, `🎲 Random` problem selector, and built-in practice **Stopwatch Timer**.
+  - Multi-tab **Testcase Workbench** (`Case 1`, `Case 2`, `Case 3` + live diff inspector) and auto-formatter (`Format` / `Shift+Alt+F`).
 
-## Requirements
-
-| Tool | Purpose |
-|------|---------|
-| JDK 8+ | `javac` / `java` must be on PATH |
-| Node.js 18+ | server runtime |
-
-## Run it
-
-```bash
-npm start          # -> http://localhost:3000
-```
-
-## Architecture
-
-```
-codepad/
-├── package.json
-├── server/
-│   ├── index.js                 # http server + static assets
-│   ├── routes/api.js            # GET /api/questions · POST /api/run · POST /api/submit
-│   └── services/java-runner.js  # sandboxed temp-dir compile+run with timeouts
-├── public/
-│   ├── index.html               # shell: sidebar | question pane | editor workspace
-│   ├── css/style.css
-│   ├── js/editor.js             # dependency-free java editor component
-│   ├── js/app.js                # app state, rendering, run/submit flow
-│   └── data/questions.json      # generated question bank
-└── tools/
-    ├── parse.js                 # docx -> questions.json converter (+ data overrides)
-    └── docx_text.txt            # extracted docx text (gitignored)
-```
-
-### API
-
-| Endpoint | Method | Body | Returns |
-|----------|--------|------|---------|
-| `/api/questions` | GET | – | id/title/difficulty/concept/section list |
-| `/api/run` | POST | `{code, stdin}` | `{stage, stdout, stderr, compileOutput, timeMs}` |
-| `/api/submit` | POST | `{questionId, code}` | `{verdict, results[]}` per-test pass/fail + diff |
-
-Execution is isolated: each run gets a fresh temp directory, a 10s runtime limit
-(20s compile), and output capped at 512 KB.
-
-### Regenerating the question bank
+## 🚀 Quick Start (Local Execution Engine)
 
 ```bash
-npm run parse      # tools/docx_text.txt -> public/questions.json
+npm test           # Run automated self-test suite across Java, C++17, Python 3, Node.js & 93 problems
+npm start          # Launch ForgeJudge local server -> http://localhost:3000
 ```
 
-The source docx contains two self-contradictions which are fixed by documented
-overrides in `tools/parse.js` (Q6 class-loading order, Q11 double precision).
+## 🛠️ Rebuilding the Verified Problem Bank
 
-## Deployment notes
-
-**Local mode** (`npm start`) always executes Java with your installed JDK —
-no configuration needed.
-
-**Static hosting (Vercel)** has no Java runtime, and the public Piston API now
-requires authorization (not issued for personal projects since Feb 2026). On a
-static deployment CodePad therefore uses [JDoodle's](https://www.jdoodle.com/compiler-api/)
-free tier: sign up, click the gear icon in the toolbar, paste your
-clientId/clientSecret — stored only in your browser's localStorage.
-
-Progress, saved code per question, completion state, and the last-open question
-all persist in localStorage regardless of hosting mode.
-
-## Notes
-
-- Judging compares normalized text (CRLF-insensitive, trailing whitespace ignored)
-- Code autosaves per question as you type; Reset restores the template
+```bash
+npm run build:bank # Compiles all 93 reference solutions and regenerates public/questions.json
+```
