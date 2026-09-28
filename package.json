@@ -1,10 +1,12 @@
 {
-  "name": "codepad",
-  "version": "1.0.0",
-  "description": "Local Java OOPS practice platform - question bank on the left, live code editor with Run/Submit on the right",
+  "name": "forgejudge",
+  "version": "2.0.0",
+  "description": "ForgeJudge — Local Algorithmic & CSES / OOPS Multi-Language Test Execution Engine (93 Verified Problems)",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
+    "test": "node tools/verify-bank.js",
+    "build:bank": "node tools/build-bank.js",
     "parse": "node tools/parse.js"
   },
   "engines": {
