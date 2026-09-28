@@ -3,66 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodePad · Java OOPS Practice</title>
+  <title>ForgeJudge · Local Algorithmic &amp; CSES / OOPS Execution Engine</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
   <header class="topbar">
-    <button id="sidebarToggle" class="icon-btn" title="Toggle question list">&#9776;</button>
+    <button id="sidebarToggle" class="icon-btn" title="Toggle problem explorer (Ctrl+B)">&#9776;</button>
     <div class="brand">
-      <span class="brand-logo">{}</span>
-      <span class="brand-name">Code<span class="accent">Pad</span></span>
-      <span class="brand-sub">Java OOPS Practice</span>
+      <span class="brand-logo">&#9889;</span>
+      <div class="brand-titles">
+        <span class="brand-name">Forge<span class="accent">Judge</span></span>
+        <span class="brand-sub">CSES Problem Sheet &amp; Java OOPS Local Execution Engine</span>
+      </div>
     </div>
+
+    <div id="engineStatusPill" class="engine-pill" title="Click to inspect local compiler toolchains">
+      <span class="status-dot"></span>
+      <span id="engineStatusText">Probing Local Engine...</span>
+    </div>
+
+    <div class="timer-widget" title="Practice Stopwatch">
+      <span id="timerDisplay" class="timer-display">00:00</span>
+      <button id="timerToggleBtn" class="timer-btn" title="Start / Pause Timer">&#9654;</button>
+      <button id="timerResetBtn" class="timer-btn" title="Reset Timer">&#8634;</button>
+    </div>
+
+    <button id="randomBtn" class="btn btn-ghost small" title="Pick a random unsolved problem from active track">&#127922; Random</button>
+
     <div class="progress-wrap">
+      <div class="progress-stats">
+        <span id="progressText" class="progress-text">0 / 93 solved</span>
+        <span id="trackBreakdown" class="track-breakdown">CSES 0/53 · OOPS 0/40</span>
+      </div>
       <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-      <span id="progressText" class="progress-text">0 / 40 solved</span>
     </div>
   </header>
 
   <main class="layout">
-    <!-- Question list -->
+    <!-- Problem Explorer Sidebar -->
     <aside id="sidebar" class="sidebar">
-      <input id="searchBox" type="text" class="search-box" placeholder="Search questions..." autocomplete="off" />
+      <div class="track-tabs" id="trackTabs">
+        <button class="track-tab active" data-track="ALL">All <span id="countAll" class="tab-count">93</span></button>
+        <button class="track-tab" data-track="CSES Problem Set">CSES <span id="countCses" class="tab-count">53</span></button>
+        <button class="track-tab" data-track="Java OOPS 40">OOPS <span id="countOops" class="tab-count">40</span></button>
+      </div>
+
+      <div class="sidebar-controls">
+        <input id="searchBox" type="text" class="search-box" placeholder="Search ID, title, topic... (/)" autocomplete="off" />
+        <div class="filter-pills" id="diffFilters">
+          <button class="filter-pill active" data-diff="ALL">All</button>
+          <button class="filter-pill" data-diff="EASY">Easy</button>
+          <button class="filter-pill" data-diff="MEDIUM">Med</button>
+          <button class="filter-pill" data-diff="HARD">Hard</button>
+          <button class="filter-pill" data-diff="UNSOLVED">Unsolved</button>
+        </div>
+      </div>
+
       <nav id="questionList" class="question-list"><!-- rendered by app.js --></nav>
     </aside>
 
-    <!-- Question detail -->
+    <!-- Problem Statement & Reference Pane -->
     <section id="questionPane" class="question-pane">
-      <div class="pane-empty">Select a question to begin</div>
+      <div class="pane-empty">Select a problem from the CSES or OOPS track to begin</div>
     </section>
 
-    <!-- Editor workspace -->
+    <!-- Multi-Language Code Editor & Testcase Workbench -->
     <section class="workspace">
       <div class="editor-toolbar">
-        <span id="fileName" class="file-name">Main.java</span>
-        <span id="saveIndicator" class="save-indicator" aria-live="polite"></span>
+        <div class="editor-left-controls">
+          <select id="langSelect" class="lang-select" title="Select Execution Language">
+            <option value="java">Java (JDK)</option>
+            <option value="cpp">C++17 (g++ -O2)</option>
+            <option value="python">Python 3</option>
+            <option value="javascript">Node.js (JavaScript)</option>
+          </select>
+          <span id="fileName" class="file-name">Main.java</span>
+          <span id="saveIndicator" class="save-indicator" aria-live="polite"></span>
+        </div>
+
         <div class="toolbar-actions">
-          <button id="runnerBtn" class="btn btn-ghost" title="Configure Java runner for this deployment">&#9881;</button>
-          <button id="resetBtn" class="btn btn-ghost" title="Restore predefined code">Reset</button>
-          <button id="formatBtn" class="btn btn-ghost" title="Re-indent selection">Indent</button>
-          <button id="runBtn" class="btn btn-run" title="Ctrl+Enter">&#9654; Run</button>
-          <button id="submitBtn" class="btn btn-submit" title="Run against sample tests">Submit &#10003;</button>
+          <button id="fontDownBtn" class="btn btn-ghost small" title="Decrease Editor Font Size">A-</button>
+          <button id="fontUpBtn" class="btn btn-ghost small" title="Increase Editor Font Size">A+</button>
+          <button id="runnerBtn" class="btn btn-ghost small" title="Toolchain &amp; Runner Diagnostics">&#9881;</button>
+          <button id="formatBtn" class="btn btn-ghost small" title="Auto-format &amp; indent code (Shift+Alt+F)">Format</button>
+          <button id="resetBtn" class="btn btn-ghost small" title="Restore starter template">Reset</button>
+          <button id="runBtn" class="btn btn-run" title="Run against active testcase input (Ctrl+Enter)">&#9654; Run</button>
+          <button id="submitBtn" class="btn btn-submit" title="Judge against all verified testcases (Ctrl+Shift+Enter)">&#9889; Submit Judge</button>
         </div>
       </div>
 
       <div id="editor" class="editor"></div>
 
-      <div class="stdin-wrap">
-        <div class="stdin-header" id="stdinHeader">
-          <span>Custom Input (stdin)</span>
-          <span id="stdinChevron" class="chevron">&#9660;</span>
+      <!-- Bottom Workbench: Testcases & Execution Console -->
+      <div class="workbench-wrap">
+        <div class="workbench-header">
+          <div class="workbench-tabs">
+            <button id="tabTestcases" class="wb-tab active" data-pane="stdinPane">&#129514; Testcase Input</button>
+            <button id="tabConsole" class="wb-tab" data-pane="consolePane">&#128187; Judge Console <span id="consoleBadge" class="wb-badge"></span></button>
+          </div>
+          <div class="workbench-meta">
+            <span id="consoleMeta">Ready</span>
+            <button id="stdinHeader" class="icon-btn small" title="Collapse / Expand Workbench">&#9660;</button>
+          </div>
         </div>
-        <textarea id="stdinBox" spellcheck="false" placeholder="Preloaded with the sample input"></textarea>
-      </div>
 
-      <div class="console-wrap">
-        <div class="console-header">
-          <span id="consoleTitle">Console</span>
-          <span id="consoleMeta"></span>
+        <div id="stdinPane" class="wb-pane active">
+          <div id="caseTabs" class="case-tabs"><!-- Case 1, Case 2, ... buttons --></div>
+          <textarea id="stdinBox" spellcheck="false" placeholder="Custom standard input (stdin)..."></textarea>
         </div>
-        <div id="consoleBody" class="console-body">
-          <div class="console-hint">Press Run to execute, or Submit to evaluate against the sample tests.</div>
+
+        <div id="consolePane" class="wb-pane">
+          <div id="consoleBody" class="console-body">
+            <div class="console-hint">Press <b>Run (Ctrl+Enter)</b> to execute custom input, or <b>Submit Judge (Ctrl+Shift+Enter)</b> to run the full multi-testcase suite.</div>
+          </div>
         </div>
       </div>
     </section>
