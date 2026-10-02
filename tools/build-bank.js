@@ -15,6 +15,7 @@ const sortingSearching = require('./cses/sorting-searching');
 const dynamicProgramming = require('./cses/dynamic-programming');
 const graphsTrees = require('./cses/graphs-trees');
 const rangeQueriesMath = require('./cses/range-queries-math');
+const stringGeometry = require('./cses/string-geometry');
 
 /**
  * Generate additional varied inputs for OOPS problems based on their sampleInput format
@@ -111,6 +112,7 @@ async function main() {
     ...dynamicProgramming,
     ...graphsTrees,
     ...rangeQueriesMath,
+    ...stringGeometry,
   ];
 
   const allQuestions = [...oopsQuestions, ...csesQuestions];
@@ -152,6 +154,7 @@ async function main() {
       label: idx === 0 ? 'Sample Case 1' : `Test Case ${idx + 1}`,
       input: r.input,
       expected: normalizeOutput(r.actual),
+      ...(q.checker ? { checker: q.checker } : {})
     }));
 
     q.templates = defaultLanguageTemplates(q);

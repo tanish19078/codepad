@@ -64,11 +64,37 @@ function execFileWithInput(cmd, args, input, timeoutMs, cwd) {
     let stderr = '';
     let timedOut = false;
     let settled = false;
+    let maxMemoryKb = 0;
 
     const timer = setTimeout(() => {
       timedOut = true;
       try { child.kill('SIGKILL'); } catch (_) { child.kill(); }
     }, timeoutMs);
+
+    const memInterval = setInterval(() => {
+      if (settled || !child.pid) return;
+      if (process.platform === 'win32') {
+        const memChild = spawn('tasklist', ['/FI', `PID eq ${child.pid}`, '/FO', 'CSV', '/NH'], { windowsHide: true });
+        let out = '';
+        memChild.stdout.on('data', d => out += d.toString());
+        memChild.on('close', () => {
+          const parts = out.split('","');
+          if (parts.length >= 5) {
+            const memStr = parts[4].replace(/[^\d]/g, '');
+            const mem = parseInt(memStr, 10);
+            if (!isNaN(mem) && mem > maxMemoryKb) maxMemoryKb = mem;
+          }
+        });
+      } else {
+        const memChild = spawn('ps', ['-o', 'rss=', '-p', String(child.pid)]);
+        let out = '';
+        memChild.stdout.on('data', d => out += d.toString());
+        memChild.on('close', () => {
+          const mem = parseInt(out.trim(), 10);
+          if (!isNaN(mem) && mem > maxMemoryKb) maxMemoryKb = mem;
+        });
+      }
+    }, 100);
 
     child.stdout.on('data', d => {
       if (stdout.length < MAX_OUTPUT_BYTES) stdout += d.toString();
@@ -80,18 +106,21 @@ function execFileWithInput(cmd, args, input, timeoutMs, cwd) {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      clearInterval(memInterval);
       reject(err);
     });
     child.on('close', exitCode => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      clearInterval(memInterval);
       resolve({
         code: timedOut ? 124 : (exitCode ?? 0),
         stdout,
         stderr,
         timedOut,
         timeMs: Date.now() - started,
+        memoryKb: maxMemoryKb,
       });
     });
 
@@ -326,7 +355,17 @@ async function judgeSubmission({ code, language = 'java', testcases = [], timeou
         stage = 'runtime';
         tcVerdict = 'RUNTIME_ERROR';
       } else {
-        passed = normalizeOutput(runRes.stdout) === normalizeOutput(tc.expected);
+        if (tc.checker) {
+          try {
+            const checkerFn = new Function('input', 'expected', 'actual', tc.checker);
+            passed = checkerFn(tc.input, tc.expected, runRes.stdout);
+          } catch (err) {
+            console.error('[SPJ] Checker error:', err);
+            passed = false;
+          }
+        } else {
+          passed = normalizeOutput(runRes.stdout) === normalizeOutput(tc.expected);
+        }
         tcVerdict = passed ? 'ACCEPTED' : 'WRONG_ANSWER';
       }
 
@@ -344,6 +383,7 @@ async function judgeSubmission({ code, language = 'java', testcases = [], timeou
           : runRes.stderr,
         compileOutput: '',
         timeMs: runRes.timeMs,
+        memoryKb: runRes.memoryKb || 0,
       });
     }
   } finally {

@@ -220,6 +220,19 @@ public class Main {
     sampleInput: '5',
     sampleOutput: '2 4 1 3 5',
     testInputs: ['5', '3', '1', '4', '6'],
+    checker: `
+      const n = parseInt(input.trim(), 10);
+      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';
+      const arr = actual.trim().split(/\\s+/).map(Number);
+      if (arr.length !== n) return false;
+      const seen = new Set();
+      for (let i = 0; i < n; i++) {
+        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;
+        seen.add(arr[i]);
+        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;
+      }
+      return true;
+    `,
   },
   {
     id: 106,
@@ -379,6 +392,24 @@ public class Main {
     sampleInput: '7',
     sampleOutput: 'YES\n3\n7 6 1\n4\n5 4 3 2',
     testInputs: ['7', '6', '8', '3'],
+    checker: `
+      const n = parseInt(input.trim(), 10);
+      const sum = (n * (n + 1)) / 2;
+      if (sum % 2 !== 0) return actual.trim() === 'NO';
+      const lines = actual.trim().split('\\n').map(l => l.trim());
+      if (lines[0] !== 'YES' || lines.length < 5) return false;
+      const s1Count = parseInt(lines[1], 10);
+      const s1 = lines[2].split(/\\s+/).map(Number);
+      const s2Count = parseInt(lines[3], 10);
+      const s2 = lines[4].split(/\\s+/).map(Number);
+      if (s1.length !== s1Count || s2.length !== s2Count) return false;
+      if (s1Count + s2Count !== n) return false;
+      const seen = new Set();
+      let sum1 = 0, sum2 = 0;
+      for (const x of s1) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum1 += x; }
+      for (const x of s2) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum2 += x; }
+      return sum1 === sum2 && sum1 === sum / 2;
+    `,
   },
   {
     id: 109,
