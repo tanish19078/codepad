@@ -307,7 +307,8 @@
 
   function renderRunResult(r) {
     switchWorkbenchTab('consolePane');
-    const meta = r.timeMs != null ? `${r.timeMs} ms · ${state.language.toUpperCase()}` : state.language.toUpperCase();
+    const memStr = r.memoryKb ? ` · ${r.memoryKb} KB` : '';
+    const meta = r.timeMs != null ? `${r.timeMs} ms${memStr} · ${state.language.toUpperCase()}` : state.language.toUpperCase();
     $('#consoleMeta').textContent = meta;
     $('#consoleBadge').textContent = r.stage === 'ok' ? 'OK' : 'ERR';
     const body = $('#consoleBody');
@@ -369,9 +370,10 @@
 
     for (let i = 0; i < data.results.length; i++) {
       const r = data.results[i];
+      const memDisplay = r.memoryKb ? ` / ${r.memoryKb} KB` : '';
       const status = r.passed
-        ? `<span>&#10003; PASSED (${r.timeMs || 0} ms)</span>`
-        : `<span>&#10007; ${r.verdict || 'FAILED'} (${r.timeMs || 0} ms)</span>`;
+        ? `<span>&#10003; PASSED (${r.timeMs || 0} ms${memDisplay})</span>`
+        : `<span>&#10007; ${r.verdict || 'FAILED'} (${r.timeMs || 0} ms${memDisplay})</span>`;
       let inner = '';
 
       if (r.stage === 'compile') {
