@@ -1635,31 +1635,37 @@
     "solutionCode": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        if (n == 1) {\n            System.out.println(1);\n            return;\n        }\n        if (n == 2 || n == 3) {\n            System.out.println(\"NO SOLUTION\");\n            return;\n        }\n        StringBuilder sb = new StringBuilder();\n        for (int i = 2; i <= n; i += 2) {\n            sb.append(i).append(' ');\n        }\n        for (int i = 1; i <= n; i += 2) {\n            sb.append(i).append(' ');\n        }\n        System.out.println(sb.toString().trim());\n    }\n}",
     "sampleInput": "5",
     "sampleOutput": "2 4 1 3 5",
+    "checker": "\n      const n = parseInt(input.trim(), 10);\n      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';\n      const arr = actual.trim().split(/\\s+/).map(Number);\n      if (arr.length !== n) return false;\n      const seen = new Set();\n      for (let i = 0; i < n; i++) {\n        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;\n        seen.add(arr[i]);\n        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;\n      }\n      return true;\n    ",
     "testcases": [
       {
         "label": "Sample Case 1",
         "input": "5",
-        "expected": "2 4 1 3 5"
+        "expected": "2 4 1 3 5",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';\n      const arr = actual.trim().split(/\\s+/).map(Number);\n      if (arr.length !== n) return false;\n      const seen = new Set();\n      for (let i = 0; i < n; i++) {\n        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;\n        seen.add(arr[i]);\n        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;\n      }\n      return true;\n    "
       },
       {
         "label": "Test Case 2",
         "input": "3",
-        "expected": "NO SOLUTION"
+        "expected": "NO SOLUTION",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';\n      const arr = actual.trim().split(/\\s+/).map(Number);\n      if (arr.length !== n) return false;\n      const seen = new Set();\n      for (let i = 0; i < n; i++) {\n        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;\n        seen.add(arr[i]);\n        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;\n      }\n      return true;\n    "
       },
       {
         "label": "Test Case 3",
         "input": "1",
-        "expected": "1"
+        "expected": "1",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';\n      const arr = actual.trim().split(/\\s+/).map(Number);\n      if (arr.length !== n) return false;\n      const seen = new Set();\n      for (let i = 0; i < n; i++) {\n        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;\n        seen.add(arr[i]);\n        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;\n      }\n      return true;\n    "
       },
       {
         "label": "Test Case 4",
         "input": "4",
-        "expected": "2 4 1 3"
+        "expected": "2 4 1 3",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';\n      const arr = actual.trim().split(/\\s+/).map(Number);\n      if (arr.length !== n) return false;\n      const seen = new Set();\n      for (let i = 0; i < n; i++) {\n        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;\n        seen.add(arr[i]);\n        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;\n      }\n      return true;\n    "
       },
       {
         "label": "Test Case 5",
         "input": "6",
-        "expected": "2 4 6 1 3 5"
+        "expected": "2 4 6 1 3 5",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      if (n === 2 || n === 3) return actual.trim() === 'NO SOLUTION';\n      const arr = actual.trim().split(/\\s+/).map(Number);\n      if (arr.length !== n) return false;\n      const seen = new Set();\n      for (let i = 0; i < n; i++) {\n        if (arr[i] < 1 || arr[i] > n || seen.has(arr[i])) return false;\n        seen.add(arr[i]);\n        if (i > 0 && Math.abs(arr[i] - arr[i - 1]) === 1) return false;\n      }\n      return true;\n    "
       }
     ],
     "templates": {
@@ -1777,26 +1783,31 @@
     "solutionCode": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long sum = (long) n * (n + 1) / 2;\n        if (sum % 2 != 0) {\n            System.out.println(\"NO\");\n            return;\n        }\n        System.out.println(\"YES\");\n        long target = sum / 2;\n        List<Integer> s1 = new ArrayList<>();\n        List<Integer> s2 = new ArrayList<>();\n        for (int i = n; i >= 1; i--) {\n            if (i <= target) {\n                s1.add(i);\n                target -= i;\n            } else {\n                s2.add(i);\n            }\n        }\n        StringBuilder sb = new StringBuilder();\n        sb.append(s1.size()).append('\\n');\n        for (int i = 0; i < s1.size(); i++) {\n            if (i > 0) sb.append(' ');\n            sb.append(s1.get(i));\n        }\n        sb.append('\\n').append(s2.size()).append('\\n');\n        for (int i = 0; i < s2.size(); i++) {\n            if (i > 0) sb.append(' ');\n            sb.append(s2.get(i));\n        }\n        System.out.println(sb.toString());\n    }\n}",
     "sampleInput": "7",
     "sampleOutput": "YES\n3\n7 6 1\n4\n5 4 3 2",
+    "checker": "\n      const n = parseInt(input.trim(), 10);\n      const sum = (n * (n + 1)) / 2;\n      if (sum % 2 !== 0) return actual.trim() === 'NO';\n      const lines = actual.trim().split('\\n').map(l => l.trim());\n      if (lines[0] !== 'YES' || lines.length < 5) return false;\n      const s1Count = parseInt(lines[1], 10);\n      const s1 = lines[2].split(/\\s+/).map(Number);\n      const s2Count = parseInt(lines[3], 10);\n      const s2 = lines[4].split(/\\s+/).map(Number);\n      if (s1.length !== s1Count || s2.length !== s2Count) return false;\n      if (s1Count + s2Count !== n) return false;\n      const seen = new Set();\n      let sum1 = 0, sum2 = 0;\n      for (const x of s1) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum1 += x; }\n      for (const x of s2) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum2 += x; }\n      return sum1 === sum2 && sum1 === sum / 2;\n    ",
     "testcases": [
       {
         "label": "Sample Case 1",
         "input": "7",
-        "expected": "YES\n3\n7 6 1\n4\n5 4 3 2"
+        "expected": "YES\n3\n7 6 1\n4\n5 4 3 2",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      const sum = (n * (n + 1)) / 2;\n      if (sum % 2 !== 0) return actual.trim() === 'NO';\n      const lines = actual.trim().split('\\n').map(l => l.trim());\n      if (lines[0] !== 'YES' || lines.length < 5) return false;\n      const s1Count = parseInt(lines[1], 10);\n      const s1 = lines[2].split(/\\s+/).map(Number);\n      const s2Count = parseInt(lines[3], 10);\n      const s2 = lines[4].split(/\\s+/).map(Number);\n      if (s1.length !== s1Count || s2.length !== s2Count) return false;\n      if (s1Count + s2Count !== n) return false;\n      const seen = new Set();\n      let sum1 = 0, sum2 = 0;\n      for (const x of s1) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum1 += x; }\n      for (const x of s2) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum2 += x; }\n      return sum1 === sum2 && sum1 === sum / 2;\n    "
       },
       {
         "label": "Test Case 2",
         "input": "6",
-        "expected": "NO"
+        "expected": "NO",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      const sum = (n * (n + 1)) / 2;\n      if (sum % 2 !== 0) return actual.trim() === 'NO';\n      const lines = actual.trim().split('\\n').map(l => l.trim());\n      if (lines[0] !== 'YES' || lines.length < 5) return false;\n      const s1Count = parseInt(lines[1], 10);\n      const s1 = lines[2].split(/\\s+/).map(Number);\n      const s2Count = parseInt(lines[3], 10);\n      const s2 = lines[4].split(/\\s+/).map(Number);\n      if (s1.length !== s1Count || s2.length !== s2Count) return false;\n      if (s1Count + s2Count !== n) return false;\n      const seen = new Set();\n      let sum1 = 0, sum2 = 0;\n      for (const x of s1) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum1 += x; }\n      for (const x of s2) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum2 += x; }\n      return sum1 === sum2 && sum1 === sum / 2;\n    "
       },
       {
         "label": "Test Case 3",
         "input": "8",
-        "expected": "YES\n3\n8 7 3\n5\n6 5 4 2 1"
+        "expected": "YES\n3\n8 7 3\n5\n6 5 4 2 1",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      const sum = (n * (n + 1)) / 2;\n      if (sum % 2 !== 0) return actual.trim() === 'NO';\n      const lines = actual.trim().split('\\n').map(l => l.trim());\n      if (lines[0] !== 'YES' || lines.length < 5) return false;\n      const s1Count = parseInt(lines[1], 10);\n      const s1 = lines[2].split(/\\s+/).map(Number);\n      const s2Count = parseInt(lines[3], 10);\n      const s2 = lines[4].split(/\\s+/).map(Number);\n      if (s1.length !== s1Count || s2.length !== s2Count) return false;\n      if (s1Count + s2Count !== n) return false;\n      const seen = new Set();\n      let sum1 = 0, sum2 = 0;\n      for (const x of s1) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum1 += x; }\n      for (const x of s2) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum2 += x; }\n      return sum1 === sum2 && sum1 === sum / 2;\n    "
       },
       {
         "label": "Test Case 4",
         "input": "3",
-        "expected": "YES\n1\n3\n2\n2 1"
+        "expected": "YES\n1\n3\n2\n2 1",
+        "checker": "\n      const n = parseInt(input.trim(), 10);\n      const sum = (n * (n + 1)) / 2;\n      if (sum % 2 !== 0) return actual.trim() === 'NO';\n      const lines = actual.trim().split('\\n').map(l => l.trim());\n      if (lines[0] !== 'YES' || lines.length < 5) return false;\n      const s1Count = parseInt(lines[1], 10);\n      const s1 = lines[2].split(/\\s+/).map(Number);\n      const s2Count = parseInt(lines[3], 10);\n      const s2 = lines[4].split(/\\s+/).map(Number);\n      if (s1.length !== s1Count || s2.length !== s2Count) return false;\n      if (s1Count + s2Count !== n) return false;\n      const seen = new Set();\n      let sum1 = 0, sum2 = 0;\n      for (const x of s1) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum1 += x; }\n      for (const x of s2) { if (x < 1 || x > n || seen.has(x)) return false; seen.add(x); sum2 += x; }\n      return sum1 === sum2 && sum1 === sum / 2;\n    "
       }
     ],
     "templates": {
